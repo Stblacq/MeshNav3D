@@ -4,11 +4,8 @@ from typing import Optional
 import numpy as np
 import pyvista as pv
 
+from visualize.planners.planner import Planner
 
-theta_max = np.radians(60)
-a_max = 0.5
-steering_rate_max = np.radians(60)
-v_max = 0.5
 
 def cost_function(current_state, next_state, control, target, mesh):
     distance_cost = np.linalg.norm(next_state[:3] - target[:3])
@@ -24,6 +21,10 @@ def cost_function(current_state, next_state, control, target, mesh):
         cos_theta = 1.0  # Default to 1 (zero angle) if there's no meaningful direction
 
     theta = np.arccos(cos_theta)
+    theta_max = np.radians(60)
+    a_max = 0.5
+    steering_rate_max = np.radians(60)
+
     curvature_cost = (max(0, theta - theta_max) / theta_max) ** 2
 
     acceleration_cost = (max(0, abs(control[0]) - a_max) / a_max) ** 2
@@ -53,11 +54,11 @@ def dynamics(x: np.ndarray, u: np.ndarray, dt: float) -> np.ndarray:
     return np.array([x_new, y_new, z_new, yaw_new, v_new])
 
 
-def mppi(x, target, dt,  mesh, num_samples=100, time_horizon=10, lambda_=1.0):
+def mppi(x, target, dt, mesh, num_samples=100, time_horizon=10, lambda_=1.0):
     control_samples = np.random.uniform(-1, 1,
                                         (num_samples, time_horizon, 2))  # Only 2 controls now (accel, steering_rate)
 
-    trajectory_costs = get_trajectories_costs(control_samples, dt, target, x,  mesh)
+    trajectory_costs = get_trajectories_costs(control_samples, dt, target, x, mesh)
 
     weights = np.exp(-trajectory_costs / lambda_)
 
@@ -71,12 +72,12 @@ def mppi(x, target, dt,  mesh, num_samples=100, time_horizon=10, lambda_=1.0):
     return optimal_control
 
 
-def get_trajectories_costs(control_samples, dt, target, x,  mesh):
+def get_trajectories_costs(control_samples, dt, target, x, mesh):
     num_samples, _, _ = control_samples.shape
     trajectory_costs = np.zeros(num_samples)
     for i in range(num_samples):
         control_sequence = control_samples[i]
-        cost = get_trajectory_cost(dt, control_sequence, target, x,  mesh)
+        cost = get_trajectory_cost(dt, control_sequence, target, x, mesh)
         trajectory_costs[i] = cost
 
     min_cost = np.min(trajectory_costs)
@@ -84,7 +85,7 @@ def get_trajectories_costs(control_samples, dt, target, x,  mesh):
     return trajectory_costs
 
 
-def get_trajectory_cost(dt, control_sequence, target, current_state,  mesh):
+def get_trajectory_cost(dt, control_sequence, target, current_state, mesh):
     x_current = current_state
     cost = 0
     for t in range(control_sequence.shape[0]):
@@ -93,7 +94,6 @@ def get_trajectory_cost(dt, control_sequence, target, current_state,  mesh):
         cost += cost_function(x_current, x_next, u, target, mesh)
         x_current = x_next
     return cost
-
 
 
 def project_to_closest_face(x, mesh):
@@ -117,41 +117,43 @@ def project_to_closest_face(x, mesh):
     return x
 
 
-def mppi_planner(start_point: np.ndarray,
-                 goal_point: np.ndarray,
-                 plotter: Optional[pv.Plotter] ,
-                 mesh: pv.DataSet,
-                 time_horizon=10,
-                 ) -> Optional[dict] :
-    dt = 0.5
-    max_steps = 100000
-    trajectory = []
-    control_efforts = []
-    x_current = np.concatenate([start_point, [0, 0]])  # start_point was 3D, now adding yaw=0, v=0
+class MPPIPlanner(Planner):
+    def plan(self, start_point: np.ndarray,
+             goal_point: np.ndarray,
+             plotter: Optional[pv.Plotter],
+             mesh: pv.DataSet,
+             time_horizon: float = 10.0,
+             max_iterations: int = 1000) -> Optional[dict]:
 
-    trajectory.append(x_current.copy())
-    start_time = time.time()
+        dt = 0.5
+        max_steps = 100000
+        trajectory = []
+        control_efforts = []
+        x_current = np.concatenate([start_point, [0, 0]])  # start_point was 3D, now adding yaw=0, v=0
 
-    for step in range(max_steps):
-        optimal_control = mppi(x_current, goal_point, dt, 
-                               mesh, num_samples=100, time_horizon=time_horizon, lambda_=1.0)
-        x_current = dynamics(x_current, optimal_control, dt)
-        x_proj = project_to_closest_face(x_current, mesh)
-        x_current = x_proj
         trajectory.append(x_current.copy())
-        control_efforts.append(optimal_control)
-        plotter.add_mesh(pv.Sphere(radius=0.3, center=x_current[:3]), color='cyan')
+        start_time = time.time()
 
-        if np.linalg.norm(x_current[:3] - goal_point) < 0.1:
-            plotter.add_mesh(pv.Sphere(radius=0.3, center=goal_point), color='green')
-            trajectory.append(np.concatenate([goal_point, [0, 0]]))
-            execution_time = time.time() - start_time
+        for step in range(max_steps):
+            optimal_control = mppi(x_current, goal_point, dt,
+                                   mesh, num_samples=100, time_horizon=time_horizon, lambda_=1.0)
+            x_current = dynamics(x_current, optimal_control, dt)
+            x_proj = project_to_closest_face(x_current, mesh)
+            x_current = x_proj
+            trajectory.append(x_current.copy())
+            control_efforts.append(optimal_control)
+            plotter.add_mesh(pv.Sphere(radius=0.3, center=x_current[:3]), color='cyan')
 
-            return {
-                "trajectory": trajectory,
-                "controls": control_efforts,
-                "execution_time": execution_time,
-            }
+            if np.linalg.norm(x_current[:3] - goal_point) < 0.1:
+                plotter.add_mesh(pv.Sphere(radius=0.3, center=goal_point), color='green')
+                trajectory.append(np.concatenate([goal_point, [0, 0]]))
+                execution_time = time.time() - start_time
 
-    print("Max steps reached without reaching the goal.")
-    return None
+                return {
+                    "trajectory": trajectory,
+                    "controls": control_efforts,
+                    "execution_time": execution_time,
+                }
+
+        print("Max steps reached without reaching the goal.")
+        return None

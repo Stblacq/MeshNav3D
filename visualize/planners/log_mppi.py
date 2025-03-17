@@ -1,9 +1,10 @@
 import time
+from typing import Optional
 
 import numpy as np
 import pyvista as pv
 
-
+from visualize.planners.planner import Planner
 
 theta_max = np.radians(90)
 a_max = 0.5
@@ -121,41 +122,43 @@ def get_trajectory_cost(dt, control_sequence, target, current_state,  mesh):
     return cost
 
 
-def log_mppi_planner(start_point: np.ndarray,
-                 goal_point: np.ndarray,
-                 plotter: pv.Plotter | None,
-                 mesh: pv.DataSet,
-                 time_horizon=10) -> dict :
-    dt = 0.3
-    max_steps = 100000
-    trajectory = []
-    control_efforts = []
-    x_current = np.concatenate([start_point, [0, 0]])  # start_point was 3D, now adding yaw=0, v=0
+class LogMPPIPlanner(Planner):
+    def plan(self, start_point: np.ndarray,
+             goal_point: np.ndarray,
+             plotter: Optional[pv.Plotter],
+             mesh: pv.DataSet,
+             time_horizon: float = 10.0,
+             max_iterations: int = 1000) -> Optional[dict]:
+        dt = 0.3
+        max_steps = 100000
+        trajectory = []
+        control_efforts = []
+        x_current = np.concatenate([start_point, [0, 0]])  # start_point was 3D, now adding yaw=0, v=0
 
-    trajectory.append(x_current.copy())
-    start_time = time.time()
-
-    for step in range(max_steps):
-        optimal_control = log_mppi(x_current, goal_point, dt,
-                               mesh, num_samples=100, time_horizon=time_horizon, lambda_=1.0)
-        x_current = dynamics(x_current, optimal_control, dt)
-        x_proj = project_to_closest_face(x_current, mesh)
-        x_current = x_proj
         trajectory.append(x_current.copy())
-        control_efforts.append(optimal_control)
-        plotter.add_mesh(pv.Sphere(radius=0.05, center=x_current[:3]), color='pink')
+        start_time = time.time()
+
+        for step in range(max_steps):
+            optimal_control = log_mppi(x_current, goal_point, dt,
+                                   mesh, num_samples=100, time_horizon=time_horizon, lambda_=1.0)
+            x_current = dynamics(x_current, optimal_control, dt)
+            x_proj = project_to_closest_face(x_current, mesh)
+            x_current = x_proj
+            trajectory.append(x_current.copy())
+            control_efforts.append(optimal_control)
+            plotter.add_mesh(pv.Sphere(radius=0.05, center=x_current[:3]), color='pink')
 
 
-        if np.linalg.norm(x_current[:3] - goal_point) < 0.1:
-            plotter.add_mesh(pv.Sphere(radius=0.05, center=goal_point), color='green')
-            trajectory.append(np.concatenate([goal_point, [0, 0]]))
-            execution_time = time.time() - start_time
+            if np.linalg.norm(x_current[:3] - goal_point) < 0.1:
+                plotter.add_mesh(pv.Sphere(radius=0.05, center=goal_point), color='green')
+                trajectory.append(np.concatenate([goal_point, [0, 0]]))
+                execution_time = time.time() - start_time
 
-            return {
-                "trajectory": trajectory,
-                "controls": control_efforts,
-                "execution_time": execution_time,
-            }
+                return {
+                    "trajectory": trajectory,
+                    "controls": control_efforts,
+                    "execution_time": execution_time,
+                }
 
-    print("Max steps reached without reaching the goal.")
-    return None
+        print("Max steps reached without reaching the goal.")
+        return None

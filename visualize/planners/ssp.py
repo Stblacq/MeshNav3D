@@ -1,7 +1,10 @@
+from typing import Optional
+
 import numpy as np
 import pyvista as pv
 from pyvista.plotting import Plotter
 
+from visualize.planners.planner import Planner
 
 
 def check_mesh_size(mesh: pv.DataSet):
@@ -62,38 +65,41 @@ def extract_sub_mesh(mesh, radius, start_point):
     return extracted_mesh
 
 
-def sequential_submesh_planner(start_point: np.ndarray,
-                               goal_point: np.ndarray,
-                               plotter,
-                               mesh: pv.DataSet,
-                               max_iterations: int = 1000):
-    radius = 0.3
-    path = []
-    current_start = start_point
-    iteration = 0
+class SSPPlanner(Planner):
+    def plan(self, start_point: np.ndarray,
+             goal_point: np.ndarray,
+             plotter: Optional[pv.Plotter],
+             mesh: pv.DataSet,
+             time_horizon: float = 10.0,
+             max_iterations: int = 1000) -> Optional[dict]:
 
-    while iteration < max_iterations:
-        extracted_mesh = extract_sub_mesh(mesh, radius, current_start)
-        plotter.add_mesh(extracted_mesh, color='white')
-        boundary_points = get_sorted_boundary_points(extracted_mesh, current_start, goal_point, radius)
+        radius = 0.3
+        path = []
+        current_start = start_point
+        iteration = 0
 
-        if is_point_in_mesh(extracted_mesh, goal_point):
-            path.extend([current_start, goal_point])
-            break
-        else:
-            progress_made = False
-            for closest_point in boundary_points:
-                path.extend([current_start, closest_point])
-                current_start = closest_point
-                progress_made = True
+        while iteration < max_iterations:
+            extracted_mesh = extract_sub_mesh(mesh, radius, current_start)
+            plotter.add_mesh(extracted_mesh, color='white')
+            boundary_points = get_sorted_boundary_points(extracted_mesh, current_start, goal_point, radius)
+
+            if is_point_in_mesh(extracted_mesh, goal_point):
+                path.extend([current_start, goal_point])
                 break
+            else:
+                progress_made = False
+                for closest_point in boundary_points:
+                    path.extend([current_start, closest_point])
+                    current_start = closest_point
+                    progress_made = True
+                    break
 
-            if not progress_made:
-                print("No progress made, stopping the planner.")
-                break
-        iteration += 1
+                if not progress_made:
+                    print("No progress made, stopping the planner.")
+                    break
+            iteration += 1
 
-    if iteration == max_iterations:
-        print("Reached maximum iterations, stopping the planner.")
+        if iteration == max_iterations:
+            print("Reached maximum iterations, stopping the planner.")
 
-    return path
+        return path
