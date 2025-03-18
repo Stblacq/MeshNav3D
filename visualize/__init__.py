@@ -1,16 +1,16 @@
 import pyvista as pv
 
-from visualize.planners.dijkstra import dijkstra_planner
-from visualize.planners.log_mppi import log_mppi_planner
-from visualize.planners.mppi import mppi_planner
-from visualize.planners.ssp import sequential_submesh_planner
+from visualize.planners.dijkstra import DijkstraPlanner
+from visualize.planners.log_mppi import LogMPPIPlanner
+from visualize.planners.mppi import MPPIPlanner
+from visualize.planners.planner import Planner
+from visualize.planners.ssp import SSPPlanner
 import os
-from typing import Callable
 
 
 
 class Visualizer:
-    def __init__(self, mesh_file_path: str, planner: Callable):
+    def __init__(self, mesh_file_path: str, planner: Planner):
         self.clicked_points = []
         self.mesh_file_path = mesh_file_path
         self.planner = planner
@@ -43,7 +43,7 @@ class Visualizer:
                 start, goal = self.clicked_points
                 print(f"Start:{start}{type(start)}-Goal:{goal}{type(goal)}")
                 self.clicked_points.clear()
-                planning_response =  self.planner(start, goal, plotter, pv_mesh)
+                self.planner.plan(start, goal, plotter, pv_mesh)
 
                 plotter.add_points(start, color='red', point_size=5, label='Start Point')
                 plotter.add_points(goal, color='green', point_size=5, label='Goal Point')
@@ -58,19 +58,19 @@ class Visualizer:
 def run(example: str):
     if example == 'ssp':
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
-        visualizer = Visualizer(file_path, sequential_submesh_planner)
+        visualizer = Visualizer(file_path, SSPPlanner())
         visualizer.visualize()
     elif example == 'mppi':
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
-        visualizer = Visualizer(file_path, mppi_planner)
+        visualizer = Visualizer(file_path, MPPIPlanner())
         visualizer.visualize()
     elif example == 'log_mppi':
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
-        visualizer = Visualizer(file_path, log_mppi_planner)
+        visualizer = Visualizer(file_path, LogMPPIPlanner())
         visualizer.visualize()
     elif example == 'dijkstra_planner':
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
-        visualizer = Visualizer(file_path, dijkstra_planner)
+        visualizer = Visualizer(file_path, DijkstraPlanner())
         visualizer.visualize()
     else:
         print("Invalid example specified.")
