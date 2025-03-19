@@ -5,6 +5,7 @@ from visualize.planners.log_mppi import LogMPPIPlanner
 from visualize.planners.mppi import MPPIPlanner
 from visualize.planners.planner import Planner
 from visualize.planners.ssp import SSPPlanner
+from visualize.planners.jps import JPSPlanner
 import os
 
 
@@ -72,6 +73,10 @@ def run(example: str):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
         visualizer = Visualizer(file_path, DijkstraPlanner())
         visualizer.visualize()
+    elif example == 'jps_planner':
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
+        visualizer = Visualizer(file_path, JPSPlanner())
+        visualizer.visualize()
     else:
         print("Invalid example specified.")
         return
@@ -79,3 +84,4 @@ def run(example: str):
 
 if __name__ == "__main__":
     run('dijkstra_planner')
+    run('jps_planner')
