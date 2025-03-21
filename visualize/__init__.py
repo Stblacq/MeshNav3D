@@ -83,5 +83,5 @@ def run(example: str):
 
 
 if __name__ == "__main__":
-    run('dijkstra_planner')
+    # run('dijkstra_planner')
     run('jps_planner')
