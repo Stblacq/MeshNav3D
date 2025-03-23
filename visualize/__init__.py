@@ -83,4 +83,4 @@ def run(example: str):
 
 
 if __name__ == "__main__":
-    run('astar_planner')
+    run('dijkstra_planner')
