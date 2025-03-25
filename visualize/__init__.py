@@ -5,6 +5,7 @@ from visualize.planners.dijkstra import DijkstraPlanner
 from visualize.planners.log_mppi import LogMPPIPlanner
 from visualize.planners.mppi import MPPIPlanner
 from visualize.planners.planner import Planner
+from visualize.planners.rrt import RRTPlanner
 from visualize.planners.ssp import SSPPlanner
 import os
 
@@ -73,6 +74,10 @@ def run(example: str):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
         visualizer = Visualizer(file_path, DijkstraPlanner())
         visualizer.visualize()
+    elif example == 'rrt':
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
+        visualizer = Visualizer(file_path, RRTPlanner())
+        visualizer.visualize()
     elif example == 'astar_planner':
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
         visualizer = Visualizer(file_path, AStarPlanner())
@@ -83,4 +88,4 @@ def run(example: str):
 
 
 if __name__ == "__main__":
-    run('dijkstra_planner')
+    run('rrt')
