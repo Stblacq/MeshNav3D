@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "visualize-mesh"
+version = "0.1.0"
+description = ""
+authors = ["Otto Jerome <o.jerome@ieee.org>"]
+maintainers = [
+    "Otto Jerome <o.jerome@ieee.org>",
+]
+package-mode = false
+readme = "README.MD"
+[tool.poetry.dependencies]
+python = "^3.12"
+pyvista = "^0.44.2"
+gurobipy = "^12.0.0"
+tqdm = "^4.67.1"
+scipy = "^1.15.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+visualize = 'visualize.run_example'
