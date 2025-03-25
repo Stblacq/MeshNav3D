@@ -12,8 +12,8 @@ readme = "README.MD"
 python = "^3.12"
 pyvista = "^0.44.2"
 gurobipy = "^12.0.0"
-scipy = "^1.15.0"
 tqdm = "^4.67.1"
+scipy = "^1.15.0"
 
 [build-system]
 requires = ["poetry-core"]

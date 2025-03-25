@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+visualize/__pycache__/
+.idea/
+visualize/planner/__pycache__/
+
 # C extensions
 *.so
 
