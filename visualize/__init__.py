@@ -82,4 +82,4 @@ def run(example: str):
 
 
 if __name__ == "__main__":
-    run('edge_flip_planner')
+    run('dijkstra_planner')
