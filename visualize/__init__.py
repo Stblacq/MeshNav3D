@@ -2,7 +2,10 @@ import pyvista as pv
 
 from visualize.planners.a_star import AStarPlanner
 from visualize.planners.dijkstra import DijkstraPlanner
+from visualize.planners.fmm import FastMarchingPlanner
+from visualize.planners.heat_method import HeatMethodPlanner
 from visualize.planners.log_mppi import LogMPPIPlanner
+from visualize.planners.mmp import MMPPlanner
 from visualize.planners.mppi import MPPIPlanner
 from visualize.planners.planner import Planner
 from visualize.planners.ssp import SSPPlanner
@@ -27,9 +30,7 @@ class Visualizer:
         #                                   [0, 1, 0, 0],
         #                                   [0, 0, 0, 1]])
         # pv_mesh = pv_mesh.transform(transformation_matrix)
-        pv_mesh.compute_normals(inplace=True,progress_bar=True,flip_normals=True,
-    consistent_normals=True,
-    auto_orient_normals=True,)
+    #     pv_mesh.compute_normals(inplace=True,progress_bar=True,flip_normals=True,consistent_normals=True,auto_orient_normals=True,)
         pv_mesh["Elevation"] = pv_mesh.points[:, 2]
         plotter = pv.Plotter()
 
@@ -42,7 +43,6 @@ class Visualizer:
 
             if len(self.clicked_points) == 2:
                 start, goal = self.clicked_points
-                print(f"Start:{start}{type(start)}-Goal:{goal}{type(goal)}")
                 self.clicked_points.clear()
                 self.planner.plan(start, goal, plotter, pv_mesh)
 
@@ -76,6 +76,18 @@ def run(example: str):
     elif example == 'astar_planner':
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
         visualizer = Visualizer(file_path, AStarPlanner())
+        visualizer.visualize()
+    elif example == 'fmm_planner':
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
+        visualizer = Visualizer(file_path, FastMarchingPlanner())
+        visualizer.visualize()
+    elif example == 'mmp_planner':
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
+        visualizer = Visualizer(file_path, MMPPlanner())
+        visualizer.visualize()
+    elif example == 'heat_method_planner':
+        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
+        visualizer = Visualizer(file_path, HeatMethodPlanner())
         visualizer.visualize()
     else:
         print("Invalid example specified.")

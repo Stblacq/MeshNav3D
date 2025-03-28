@@ -673,6 +673,127 @@ sftp = ["paramiko (>=2.7.0)"]
 xxhash = ["xxhash (>=1.4.3)"]
 
 [[package]]
+name = "potpourri3d"
+version = "1.2.1"
+description = "An invigorating blend of 3D geometry tools in Python."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "potpourri3d-1.2.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:a7353d46658225426eb8c56bc58cf2e903ab536c2b5c49794e5689b368bf45f6"},
+    {file = "potpourri3d-1.2.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:0c7643c7df35c02f26f17723fa6a6c8cf5251d224b2d15b8abb58402170a6642"},
+    {file = "potpourri3d-1.2.1-cp310-cp310-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:fc30ccc2d83b8e3b01e1d875e1e9dfcf3cbeabbacf4c974bdecce135e5f8755a"},
+    {file = "potpourri3d-1.2.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:fccce17f1ab1b6acf7d4cee3663924a1d345538d688f738d7dcf6f9cf578c33b"},
+    {file = "potpourri3d-1.2.1-cp310-cp310-musllinux_1_2_i686.whl", hash = "sha256:fca0a18cb7c7b295d0e211fc2b82804ad39de571a7eff6725201543c58baec25"},
+    {file = "potpourri3d-1.2.1-cp310-cp310-musllinux_1_2_x86_64.whl", hash = "sha256:1e30a519fb2d47165205d310f0a00723c1d4e9b82b33c059568aea68db1c5908"},
+    {file = "potpourri3d-1.2.1-cp310-cp310-win32.whl", hash = "sha256:974fe4fcc6fd5913cccf937c64cc34cac0ffdf13fd926bc897809eae52991f8d"},
+    {file = "potpourri3d-1.2.1-cp310-cp310-win_amd64.whl", hash = "sha256:08898b17cb6c8c402d81a9032c9d4c49243af8ac5e7aaf07161b77c00394a049"},
+    {file = "potpourri3d-1.2.1-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:7dbd60c611916f91d462df9334009ef5a6c1ad6310319ecca6d7ce71e774d9d9"},
+    {file = "potpourri3d-1.2.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:51438a642887688e1a87ad1d8f09533f3337eefd634d9b00f61ff96cbfffe41d"},
+    {file = "potpourri3d-1.2.1-cp311-cp311-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:99a24cffe319a1791bb603a144d75f96aac14fb9d2a03f3300ea50ad990e55de"},
+    {file = "potpourri3d-1.2.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d3644c64e03bac0618577a03ee9f91d34a8af10aab83668e0b029c27ccae2a36"},
+    {file = "potpourri3d-1.2.1-cp311-cp311-musllinux_1_2_i686.whl", hash = "sha256:f71d3810822898b6ad61458df82dc364a15de841bc63f483efad37c6a3cad00b"},
+    {file = "potpourri3d-1.2.1-cp311-cp311-musllinux_1_2_x86_64.whl", hash = "sha256:3b0e5089566188f951a74fc239fd639e7087edf636526167107c7e124b8aae3c"},
+    {file = "potpourri3d-1.2.1-cp311-cp311-win32.whl", hash = "sha256:eaece40064084e4dbc6815f369d787117ed559bd99a5858f96d8eea01d588c74"},
+    {file = "potpourri3d-1.2.1-cp311-cp311-win_amd64.whl", hash = "sha256:9d521db6d70908d1ce1f944b22ad93127e08614cdd1d0edbc41e4750ff29142a"},
+    {file = "potpourri3d-1.2.1-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:63e81c790abba65b2b9485a61776c785970242bc9f9021b269171e6e9cb78a48"},
+    {file = "potpourri3d-1.2.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:c40734fe59c0c9b602748f58ce6f266244bdf708c381a063033124f6b76e5fad"},
+    {file = "potpourri3d-1.2.1-cp312-cp312-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:79a1afa76495c65c1d13a58bf263df8eb86faab4b3827f44090051d894b76d8d"},
+    {file = "potpourri3d-1.2.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:46c7d375b743fe118152d98e123eb3f247e1a17847156c6fba2d808725113764"},
+    {file = "potpourri3d-1.2.1-cp312-cp312-musllinux_1_2_i686.whl", hash = "sha256:d950cef4f1e98f46a266d177efdb487b0280fa98795e6f78b60d9341ace766c5"},
+    {file = "potpourri3d-1.2.1-cp312-cp312-musllinux_1_2_x86_64.whl", hash = "sha256:944ae8d59c6b1c5951d86fa429cc7644e0e2a4427000a26e73e8567f97599dcb"},
+    {file = "potpourri3d-1.2.1-cp312-cp312-win32.whl", hash = "sha256:ce3a68290bc941ec03a2294edb25d161070a0203518910ee672fab42f2942f97"},
+    {file = "potpourri3d-1.2.1-cp312-cp312-win_amd64.whl", hash = "sha256:ea0a6dd8156a243fe472dcfbc43a5a6b91c38220734ddcc7e55d48457a292bb9"},
+    {file = "potpourri3d-1.2.1-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:51f2c5a05f6d6a3a4e6daaa7fb4421a338806c6084c021c662c2cc1dd73a88a7"},
+    {file = "potpourri3d-1.2.1-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:df30f79f94021e6180f22a965180611db752501bbf4f8fb71662407281a9c086"},
+    {file = "potpourri3d-1.2.1-cp313-cp313-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:3cc60b43b1c62b1ffe182f08dee9edba1362f811f3bb5b98ad534f05b67bda64"},
+    {file = "potpourri3d-1.2.1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:a86f1697eb0f2e6592f734395c827aed3a35af31a93ba1e103b53b4887d5f936"},
+    {file = "potpourri3d-1.2.1-cp313-cp313-musllinux_1_2_i686.whl", hash = "sha256:0df438c2ea78eb15524c479759a6ea726d624faf4055e972c0dde4fddddeb278"},
+    {file = "potpourri3d-1.2.1-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:5f04e11ceb4e7e43fdd87e385d059b06c4991cf597be42cd0aca61fc44e728c7"},
+    {file = "potpourri3d-1.2.1-cp313-cp313-win32.whl", hash = "sha256:c083edf9ce5498e50e95bd2bad6d14385bc297e4aadba88958e5a996a81b7af5"},
+    {file = "potpourri3d-1.2.1-cp313-cp313-win_amd64.whl", hash = "sha256:c16d814de3b69bfccf7b43098ccd6e3381e13989451a9ba3f4aa1124905279d2"},
+    {file = "potpourri3d-1.2.1-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:3d458a35522176582fc2b36d65514a62a4c64bc43987832e5f6083a81fcf9ee6"},
+    {file = "potpourri3d-1.2.1-cp37-cp37m-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:dd876425f575e8bbdf003d0f2e61165fb1ad55df97e9e787aadb648869a6ac51"},
+    {file = "potpourri3d-1.2.1-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:262ac533e1f5e2345e72bd3e682e4c01e39226d255fd08fcbea65fbf3e7aaad8"},
+    {file = "potpourri3d-1.2.1-cp37-cp37m-musllinux_1_2_i686.whl", hash = "sha256:28a7c79a8c415cc7f53a69e5fae87fee3e2ea8e7c78ab7b0678adc728c68c884"},
+    {file = "potpourri3d-1.2.1-cp37-cp37m-musllinux_1_2_x86_64.whl", hash = "sha256:968d13e50ae1f40529b79ca5a137c9084a03d4ebedb9c5b3700476daf37ebbb5"},
+    {file = "potpourri3d-1.2.1-cp37-cp37m-win32.whl", hash = "sha256:ded87bfcb39715107fccd1a8081f9ce1f474d91208d4b58e795f0a91bfe2f6a6"},
+    {file = "potpourri3d-1.2.1-cp37-cp37m-win_amd64.whl", hash = "sha256:8cd4a429c3604f790ee8dde7e9556b6d38b99e0588ca6cc711a3ace01eb3ff78"},
+    {file = "potpourri3d-1.2.1-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:d7a20458e60d3c9f577ee4385a7c58273388b879ca9bccbd23355107b1056797"},
+    {file = "potpourri3d-1.2.1-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:960a76eef306257d35adc3dfc990150b1963b728a39b1ae154a16a4987983892"},
+    {file = "potpourri3d-1.2.1-cp38-cp38-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:000d43cdb2ca7079dd63afd1c43e0b9bb9b359c39ec94a383af027e1f1227c0b"},
+    {file = "potpourri3d-1.2.1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2955312d3238f9262a930aaa59c33be72528b4544cc77819a637548a87f8bcd2"},
+    {file = "potpourri3d-1.2.1-cp38-cp38-musllinux_1_2_i686.whl", hash = "sha256:d06e9e6c3e83410cda4bb21e6f2aad2f9afad1f54178308c895506684b7b3f42"},
+    {file = "potpourri3d-1.2.1-cp38-cp38-musllinux_1_2_x86_64.whl", hash = "sha256:480bbbc815e44d7091dad470c44712818b568b10c3cfb3d78de40e6cab17efab"},
+    {file = "potpourri3d-1.2.1-cp38-cp38-win32.whl", hash = "sha256:0330389efc0346d77b0df1091403788c59294fd9d560adf13d6afbdb275c1679"},
+    {file = "potpourri3d-1.2.1-cp38-cp38-win_amd64.whl", hash = "sha256:45aa60ff2930c3c9179c3b13c2e1db6f93534fed246da2ee29594ae5b870963e"},
+    {file = "potpourri3d-1.2.1-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:751fcc3dd1870fc3ef148a5841d371bb522b433aaeb43be64e67a38401682cdd"},
+    {file = "potpourri3d-1.2.1-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:ad546bac29bbda25a63e39c1a643ce8667ebde535958f43b68a8c87c0de4b740"},
+    {file = "potpourri3d-1.2.1-cp39-cp39-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:ecac638e4b19403ba1ba91d53dacd16d06f5e5924809b79598c118bad9911b5b"},
+    {file = "potpourri3d-1.2.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:242107aef17e981deb5e8be61afd0916362ad2895b719a4b75d5ec9655672afa"},
+    {file = "potpourri3d-1.2.1-cp39-cp39-musllinux_1_2_i686.whl", hash = "sha256:cf09d9999c673d845922a0e9004cd36595ea029b67c2db995fbff45a95ad8ae3"},
+    {file = "potpourri3d-1.2.1-cp39-cp39-musllinux_1_2_x86_64.whl", hash = "sha256:11047929dc91b0ff03130a5987bcae5f02848872ddeb5f4808cc5ae5aabf85af"},
+    {file = "potpourri3d-1.2.1-cp39-cp39-win32.whl", hash = "sha256:bc7586ff699916059bb686e8b1d54b111b948bba41b396a04b1afcb97b41585d"},
+    {file = "potpourri3d-1.2.1-cp39-cp39-win_amd64.whl", hash = "sha256:1163a023c4b3e6d0a20f5631bc434323e068c9b82d9d7da6c662b00d4ec5a3fc"},
+    {file = "potpourri3d-1.2.1-pp310-pypy310_pp73-macosx_10_15_x86_64.whl", hash = "sha256:949d497636f145ee3dda4cb1b313f36ed7b4e9334206a2b79afb6af56bc6568a"},
+    {file = "potpourri3d-1.2.1-pp310-pypy310_pp73-macosx_11_0_arm64.whl", hash = "sha256:505fef6f49182e675f8079893f41cda04f08c157c3811bbca683b31247c702eb"},
+    {file = "potpourri3d-1.2.1-pp310-pypy310_pp73-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:2b2f6bf07734e5c536d147334c7080d71666d4bc0724f3fe38e3f60d71f51bcd"},
+    {file = "potpourri3d-1.2.1-pp310-pypy310_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4a874b34d07023b88c8b75b3b16052926f3e02a17f12578fee86f557af41a078"},
+    {file = "potpourri3d-1.2.1-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:6db2f961d73464716c44a0a5dd1ed76a3d6f825388e039f4d46a5aae82623296"},
+    {file = "potpourri3d-1.2.1-pp37-pypy37_pp73-macosx_10_9_x86_64.whl", hash = "sha256:6a90a0027b48719118f172286ab42743a0742c5c5fa141d7b4c07dc60c2326ea"},
+    {file = "potpourri3d-1.2.1-pp37-pypy37_pp73-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:61c73974e5edb15d34e8d70975f945f5fbe3b93f85187d01b1cb4072b5d42c79"},
+    {file = "potpourri3d-1.2.1-pp37-pypy37_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1f85cef4fe6316e7f1b7a85657373412bbbd4cd790c853a15a343b4069a1c5e0"},
+    {file = "potpourri3d-1.2.1-pp37-pypy37_pp73-win_amd64.whl", hash = "sha256:41b9bf064d13398f094861ae17b0c83205f4b66bc8f9fcd718fe350fc13305cd"},
+    {file = "potpourri3d-1.2.1-pp38-pypy38_pp73-macosx_10_9_x86_64.whl", hash = "sha256:60d3e7e5770a4635cd2fb21439e151113468d1cccf5ef3a950bc9d6f52fe81d1"},
+    {file = "potpourri3d-1.2.1-pp38-pypy38_pp73-macosx_11_0_arm64.whl", hash = "sha256:e1ef31c00bc82e9b47102311c86b0b40321475229ef6e3a2fddb08662a981d98"},
+    {file = "potpourri3d-1.2.1-pp38-pypy38_pp73-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:7f9322ed9ea7f349049df863ada189a9f336a2219bf91d19c532e65143226ac4"},
+    {file = "potpourri3d-1.2.1-pp38-pypy38_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f26df85ae648b473e0c6b49e0d6328285ad01bcb9c988bfc290d01c5864e6030"},
+    {file = "potpourri3d-1.2.1-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:0be06b60d1cb90f6d7bcfbf8838052a1ae4d03165bb57f4cbc02cdd1b64a359f"},
+    {file = "potpourri3d-1.2.1-pp39-pypy39_pp73-macosx_10_15_x86_64.whl", hash = "sha256:b1e0096b52733762ce0abde0bb0ad4295c6d42dd7973c8409fb1cacd9acc628f"},
+    {file = "potpourri3d-1.2.1-pp39-pypy39_pp73-macosx_11_0_arm64.whl", hash = "sha256:f30d022848190e079043a3eef24ac0c9347d6e099a03c6d1bd5085215505d8b6"},
+    {file = "potpourri3d-1.2.1-pp39-pypy39_pp73-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:47b922de454cfee0b364c410facbc714bfa3f0d90ac6eef327f9cc643a29d87e"},
+    {file = "potpourri3d-1.2.1-pp39-pypy39_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:240f5a58e303f179a39f169c951fea2632d9ca801304c252301f5c34b87f1191"},
+    {file = "potpourri3d-1.2.1-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:ec375e7363a2dbe046678113a4eaf9633cd5022527f8b2ad5b3a794d57e549d9"},
+    {file = "potpourri3d-1.2.1.tar.gz", hash = "sha256:8d2629cc01e32c4803ba01899e8d50af023e91e4e346d58fbac0c88e902d495f"},
+]
+
+[package.dependencies]
+numpy = "*"
+scipy = "*"
+
+[[package]]
+name = "pygeodesic"
+version = "0.1.11"
+description = "Python library for calculating geodesic distance on triangular based surface meshes"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "pygeodesic-0.1.11-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:aad31c623cfe122cac223a7e603fc30ba6b8a56436d0a986fb1f60045c635e0c"},
+    {file = "pygeodesic-0.1.11-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:e66ecde93fa2ec3362c0d80aacc2270ad4b5882d4835444bff34223f6d6f5f51"},
+    {file = "pygeodesic-0.1.11-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:32a318f41f0910579a85aeadf2810c815f41e33d06d5abba3d9c3b475838b5cc"},
+    {file = "pygeodesic-0.1.11-cp310-cp310-win_amd64.whl", hash = "sha256:bcb310b9fa23e869f0662d0ceaeed3497eaccaa8165b2d60a37d1484069c2e7e"},
+    {file = "pygeodesic-0.1.11-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:02228e385e8ae35d520f9de8872063f88a1faf475e396a3363617b83a2fb51d3"},
+    {file = "pygeodesic-0.1.11-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:a6bde2fef5e06e6d3579bae9273dde166e068abd67616c76b96be10cd70ef9e9"},
+    {file = "pygeodesic-0.1.11-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:054242d85e7c7ed0c65d8de94aebb869c0a29b0b1719bfbc4f321088159e5255"},
+    {file = "pygeodesic-0.1.11-cp311-cp311-win_amd64.whl", hash = "sha256:e8aad25facf737ce70669e6bf16056426ae0f786721f272077ee6fbc2dfdff1c"},
+    {file = "pygeodesic-0.1.11-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:4bb9675435dbe1291989f8d3b33b80421e6ac7da819fe362fa82eab5519a16e2"},
+    {file = "pygeodesic-0.1.11-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:fc730367f4b2f7067c6f79269097d00eda969ea044c6d123db0769abca306638"},
+    {file = "pygeodesic-0.1.11-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:495101cd634df7afe108a63419a864c77098c490608934c642b9d6eabc946ec1"},
+    {file = "pygeodesic-0.1.11-cp312-cp312-win_amd64.whl", hash = "sha256:585e6fd35babbda2fa9b87f23d05e0ec26e1e416e069997ed137ac04b94f05b9"},
+    {file = "pygeodesic-0.1.11-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:223e77235d0cefafb9b37ab2bcd8b99f94d4f819dfcf18c32e6f83d270eaf614"},
+    {file = "pygeodesic-0.1.11-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:4ebb75522b7e668a056ae33958d912dfbf5f6926048eb581cd1411c109a60475"},
+    {file = "pygeodesic-0.1.11-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:667dbfc3692b0d205140275157e6275d05910de9b3cecadff2d439ebb5386e8d"},
+    {file = "pygeodesic-0.1.11-cp313-cp313-win_amd64.whl", hash = "sha256:a76e838faf172001a12ca4cab6f6df17fc5e8cba13dd2317675df83e8a14c9ae"},
+    {file = "pygeodesic-0.1.11-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:22606383c2de4d23c684508a23275e785759b34f78ea9b60222fe520277ab820"},
+    {file = "pygeodesic-0.1.11-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:b98e74f6b22dce80c74ed1aa4fedc01ca1b13cd0b660fdeb2732a15cdaa28d6e"},
+    {file = "pygeodesic-0.1.11-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4f46c00dd763ff6bebae6c5fc2437b115bd59d0a0b4f9d0158f36389680f1f1a"},
+    {file = "pygeodesic-0.1.11-cp39-cp39-win_amd64.whl", hash = "sha256:6c8fc3a92087e9757e0c4f7ebf8dd47cb031367bbf48c0277392c852b4b6e609"},
+    {file = "pygeodesic-0.1.11.tar.gz", hash = "sha256:a9b54eb20d57f5499d8b2a4a67ece675a44c6fc8d00b11e8c14c8c99edeee5ed"},
+]
+
+[package.dependencies]
+numpy = ">=2,<3"
+
+[[package]]
 name = "pyparsing"
 version = "3.2.1"
 description = "pyparsing module - Classes and methods to define and execute parsing grammars"
@@ -922,4 +1043,4 @@ web = ["wslink (>=1.0.4)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "6a4148b603f6cfb1f41b925229a85645599fd20e74001af2fd877c863ffc0798"
+content-hash = "7ff4e3f04183663828d5b900f74d5618fa6a3d382c6b3dfdc7f31704a4902fd1"

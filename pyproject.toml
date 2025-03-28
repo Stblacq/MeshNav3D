@@ -14,6 +14,8 @@ pyvista = "^0.44.2"
 gurobipy = "^12.0.0"
 scipy = "^1.15.0"
 tqdm = "^4.67.1"
+pygeodesic = "^0.1.11"
+potpourri3d = "^1.2.1"
 
 [build-system]
 requires = ["poetry-core"]
