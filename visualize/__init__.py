@@ -69,7 +69,8 @@ def run(example: str):
         'heat_method_planner': HeatMethodPlanner,
         'greedy_bfs_planner': GreedyBFSPlanner,
         'edge_flip_planner': FlipOutPlanner,
-        'theta_star_planner': ThetaStarPlanner
+        'theta_star_planner': ThetaStarPlanner,
+        'jps_planner': JPSPlanner
     }
 
     if example not in planners:
