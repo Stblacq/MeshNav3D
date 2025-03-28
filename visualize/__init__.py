@@ -2,15 +2,17 @@ import pyvista as pv
 
 from visualize.planners.a_star import AStarPlanner
 from visualize.planners.dijkstra import DijkstraPlanner
+from visualize.planners.edge_flip import FlipOutPlanner
 from visualize.planners.fmm import FastMarchingPlanner
+from visualize.planners.greedy_bfs import GreedyBFSPlanner
 from visualize.planners.heat_method import HeatMethodPlanner
 from visualize.planners.log_mppi import LogMPPIPlanner
 from visualize.planners.mmp import MMPPlanner
 from visualize.planners.mppi import MPPIPlanner
 from visualize.planners.planner import Planner
-from visualize.planners.ssp import SSPPlanner
 import os
 
+from visualize.planners.theta_star import ThetaStarPlanner
 
 
 class Visualizer:
@@ -57,42 +59,27 @@ class Visualizer:
 
 
 def run(example: str):
-    if example == 'ssp':
-        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
-        visualizer = Visualizer(file_path, SSPPlanner())
-        visualizer.visualize()
-    elif example == 'mppi':
-        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
-        visualizer = Visualizer(file_path, MPPIPlanner())
-        visualizer.visualize()
-    elif example == 'log_mppi':
-        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
-        visualizer = Visualizer(file_path, LogMPPIPlanner())
-        visualizer.visualize()
-    elif example == 'dijkstra_planner':
-        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
-        visualizer = Visualizer(file_path, DijkstraPlanner())
-        visualizer.visualize()
-    elif example == 'astar_planner':
-        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
-        visualizer = Visualizer(file_path, AStarPlanner())
-        visualizer.visualize()
-    elif example == 'fmm_planner':
-        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
-        visualizer = Visualizer(file_path, FastMarchingPlanner())
-        visualizer.visualize()
-    elif example == 'mmp_planner':
-        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
-        visualizer = Visualizer(file_path, MMPPlanner())
-        visualizer.visualize()
-    elif example == 'heat_method_planner':
-        file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", 'terrain_mesh.obj')
-        visualizer = Visualizer(file_path, HeatMethodPlanner())
-        visualizer.visualize()
-    else:
+    planners = {
+        'mppi': MPPIPlanner,
+        'log_mppi': LogMPPIPlanner,
+        'dijkstra_planner': DijkstraPlanner,
+        'astar_planner': AStarPlanner,
+        'fmm_planner': FastMarchingPlanner,
+        'mmp_planner': MMPPlanner,
+        'heat_method_planner': HeatMethodPlanner,
+        'greedy_bfs_planner': GreedyBFSPlanner,
+        'edge_flip_planner': FlipOutPlanner,
+        'theta_star_planner': ThetaStarPlanner
+    }
+
+    if example not in planners:
         print("Invalid example specified.")
         return
 
+    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", "terrain_mesh.obj")
+    visualizer = Visualizer(file_path, planners[example]())
+    visualizer.visualize()
+
 
 if __name__ == "__main__":
-    run('dijkstra_planner')
+    run('edge_flip_planner')

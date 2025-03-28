@@ -32,7 +32,7 @@ class HeatMethodPlanner(Planner):
         goal_point = np.asarray(goal_point).reshape(3)
 
         vertices = np.asarray(mesh.points)
-        faces = np.asarray(mesh.faces).reshape(-1, 4)[:, 1:]  # Remove face size prefix
+        faces = np.asarray(mesh.faces).reshape(-1, 4)[:, 1:]
 
         start_idx = np.argmin(np.linalg.norm(vertices - start_point, axis=1))
         goal_idx = np.argmin(np.linalg.norm(vertices - goal_point, axis=1))
@@ -73,7 +73,6 @@ class HeatMethodPlanner(Planner):
                 'success': False
             }
 
-        # Visualization
         if plotter is not None:
             plotter.add_mesh(mesh, opacity=0.5)
             plotter.add_points(start_point, color='red', point_size=10)
@@ -129,7 +128,7 @@ class HeatMethodPlanner(Planner):
                     gradient_dir += weight * direction / (np.linalg.norm(direction) + 1e-6)
 
             if np.linalg.norm(gradient_dir) < 1e-6:
-                break  # Gradient too small, likely converged or stuck
+                break
 
             gradient_dir /= np.linalg.norm(gradient_dir)
             current_pos += step_size * gradient_dir
