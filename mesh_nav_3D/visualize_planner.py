@@ -29,24 +29,40 @@ def instantiate_planner(planner: Union[str, Callable]) -> Optional[Planner]:
         return None
 
 
+def get_mesh_path(mesh_file_path: str) -> str:
+    if os.path.isabs(mesh_file_path):
+        final_mesh_path = mesh_file_path
+    else:
+        final_mesh_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                       "meshes", f"{mesh_file_path}.obj")
+    if not os.path.isfile(final_mesh_path):
+        raise FileNotFoundError(f"Mesh file not found: {final_mesh_path}")
+    return final_mesh_path
 
-def visualize_multiple_planners(planners: List[Union[str, Callable]], up: str = "z") -> None:
+
+def visualize_multiple_planners(planners: List[Union[str, Callable]],
+                                mesh_file_path: str,
+                                up: str = "z") -> None:
     planner_instances = []
     for planner in planners:
         planner_instance = instantiate_planner(planner)
         if planner_instance is None:
             continue
         planner_instances.append(planner_instance)
-
-    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", "terrain_mesh.obj")
-    visualizer = MultiPlannerVisualizer(file_path, planner_instances, up)
+    if not planner_instances:
+       raise ValueError("No valid planners to visualize.")
+    final_mesh_path = get_mesh_path(mesh_file_path)
+    visualizer = MultiPlannerVisualizer(final_mesh_path, planner_instances, up)
     visualizer.visualize()
 
 
-def visualize_single_planner(planner: Union[str, Callable], up: str = "z") -> None:
+
+def visualize_single_planner(planner: Union[str, Callable],
+                             mesh_file_path: str,
+                             up: str = "z") -> None:
     planner_instance = instantiate_planner(planner)
     if planner_instance is None:
         return
-    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", "terrain_mesh.obj")
-    visualizer = SinglePlannerVisualizer(file_path, planner_instance, up)
+    final_mesh_path = get_mesh_path(mesh_file_path)
+    visualizer = SinglePlannerVisualizer(final_mesh_path, planner_instance, up)
     visualizer.visualize()
