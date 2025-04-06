@@ -1,17 +1,18 @@
 import os
 from typing import Union, Callable, Optional, List
 
-from mesh_nav_3D.planners.a_star import AStarPlanner
-from mesh_nav_3D.planners.dijkstra import DijkstraPlanner
-from mesh_nav_3D.planners.edge_flip import FlipOutPlanner
-from mesh_nav_3D.planners.fmm import FastMarchingPlanner
-from mesh_nav_3D.planners.greedy_bfs import GreedyBFSPlanner
-from mesh_nav_3D.planners.heat_method import HeatMethodPlanner
-from mesh_nav_3D.planners.log_mppi import LogMPPIPlanner
-from mesh_nav_3D.planners.mmp import MMPPlanner
-from mesh_nav_3D.planners.mppi import MPPIPlanner
-from mesh_nav_3D.planners.planner import Planner
-from mesh_nav_3D.planners.theta_star import ThetaStarPlanner
+from planners import (Planner,
+                      AStarPlanner,
+                      DijkstraPlanner,
+                      FlipOutPlanner,
+                      FastMarchingPlanner,
+                      GreedyBFSPlanner,
+                      HeatMethodPlanner,
+                      LogMPPIPlanner,
+                      MMPPlanner,
+                      MPPIPlanner,
+                      ThetaStarPlanner)
+
 from mesh_nav_3D.visualizer import SinglePlannerVisualizer, MultiPlannerVisualizer
 
 
@@ -46,11 +47,9 @@ def visualize_multiple_planners(planners: List[Union[str, Callable]],
     planner_instances = []
     for planner in planners:
         planner_instance = instantiate_planner(planner)
-        if planner_instance is None:
-            continue
+        if planner_instance is None: continue
         planner_instances.append(planner_instance)
-    if not planner_instances:
-       raise ValueError("No valid planners to visualize.")
+    if not planner_instances:raise ValueError("No valid planners to visualize.")
     final_mesh_path = get_mesh_path(mesh_file_path)
     visualizer = MultiPlannerVisualizer(final_mesh_path, planner_instances, up)
     visualizer.visualize()
