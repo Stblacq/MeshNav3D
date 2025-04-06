@@ -4,7 +4,7 @@ import numpy as np
 import pyvista as pv
 from pygeodesic import geodesic
 
-from visualize.planners.planner import Planner
+from mesh_nav_3D.planners.planner import Planner
 
 
 class MMPPlanner(Planner):
@@ -12,6 +12,7 @@ class MMPPlanner(Planner):
              goal_point: np.ndarray,
              plotter: Optional[pv.Plotter],
              mesh: pv.DataSet,
+             color="blue",
              time_horizon: float = 10.0,
              max_iterations: int = 1000) -> Optional[dict]:
         """
@@ -25,6 +26,7 @@ class MMPPlanner(Planner):
             mesh (pv.DataSet): Input mesh to plan on (must be a triangular mesh)
             time_horizon (float): Maximum time horizon for planning (default: 10.0)
             max_iterations (int): Maximum number of iterations (default: 1000)
+            color:
 
         Returns:
             Optional[dict]: Dictionary containing path information or None if path not found
@@ -78,7 +80,7 @@ class MMPPlanner(Planner):
             plotter.add_points(start_point, color='red', point_size=10)
             plotter.add_points(goal_point, color='green', point_size=10)
             if result['success']:
-                plotter.add_points(path_points, color='blue', point_size=5)
+                plotter.add_points(path_points, color=color, point_size=5)
             plotter.show_axes()
             plotter.show_bounds()
 

@@ -26,7 +26,7 @@ This project provides a visualization tool for terrain path planning using diffe
 1. **Run the Simple Example:**
 
     ```bash
-    python -m visualize.__init__ simple
+    python -m mesh_nav_3D.__init__ simple
     ```
 
 ### Large Example
@@ -34,7 +34,7 @@ This project provides a visualization tool for terrain path planning using diffe
 1. **Run the Large Example:**
 
     ```bash
-    python -m visualize.__init__ large
+    python -m mesh_nav_3D.__init__ large
     ```
 
 ## Structure
@@ -62,7 +62,7 @@ This project is licensed under the MIT License.
 
 ## Examples
 ### botanical garden osnabrueck mesh
-![botanical_garden_osnabrueck_mesh](visualize/datasets/test.png)
+![botanical_garden_osnabrueck_mesh](mesh_nav_3D/datasets/test.png)
 
 ### Desert Terrain mesh
-![desert](visualize/datasets/desert.png)
+![desert](mesh_nav_3D/datasets/desert.png)

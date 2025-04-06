@@ -4,7 +4,7 @@ import numpy as np
 import pyvista as pv
 from heapq import heappush, heappop
 
-from visualize.planners.planner import Planner
+from mesh_nav_3D.planners.planner import Planner
 
 
 class AStarPlanner(Planner):
@@ -12,6 +12,7 @@ class AStarPlanner(Planner):
              goal_point: np.ndarray,
              plotter: Optional[pv.Plotter],
              mesh: pv.DataSet,
+             color="blue",
              time_horizon: float = 10.0,
              max_iterations: int = 1000) -> Optional[dict]:
         """
@@ -22,6 +23,7 @@ class AStarPlanner(Planner):
             goal_point (np.ndarray): Goal point coordinates [x, y, z]
             plotter (Optional[pv.Plotter]): PyVista plotter for visualization
             mesh (pv.DataSet): Input mesh to plan on
+            color: "blue",
             time_horizon (float): Maximum time horizon for planning (default: 10.0)
             max_iterations (int): Maximum number of iterations (default: 1000)
 
@@ -83,13 +85,12 @@ class AStarPlanner(Planner):
                     plotter.add_mesh(mesh, opacity=0.5)
                     plotter.add_points(start_point, color='red', point_size=10)
                     plotter.add_points(goal_point, color='green', point_size=10)
-                    plotter.add_points(path_points, color='blue', point_size=5)
+                    plotter.add_points(path_points, color=color, point_size=5)
                     plotter.show_axes()
                     plotter.show_bounds()
 
                 return result
 
-            # Explore neighbors
             for next_idx, dist in adj_list[current_idx]:
                 if next_idx in visited:
                     continue
@@ -103,7 +104,6 @@ class AStarPlanner(Planner):
                     new_path = path + [vertices[next_idx]]
                     heappush(open_set, (f_score[next_idx], next_idx, tentative_g, new_path))
 
-        # No path found
         result = {
             'path_points': None,
             'path_length': 0.0,

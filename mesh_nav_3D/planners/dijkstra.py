@@ -3,7 +3,7 @@ from typing import Optional
 import numpy as np
 import pyvista as pv
 
-from visualize.planners.planner import Planner
+from mesh_nav_3D.planners.planner import Planner
 
 
 class DijkstraPlanner(Planner):
@@ -11,6 +11,7 @@ class DijkstraPlanner(Planner):
              goal_point: np.ndarray,
              plotter: Optional[pv.Plotter],
              mesh: pv.DataSet,
+             color="blue",
              time_horizon: float = 10.0,
              max_iterations: int = 1000) -> Optional[dict]:
         """
@@ -25,6 +26,7 @@ class DijkstraPlanner(Planner):
 
         Returns:
             Optional[dict]: Dictionary containing path information or None if path not found
+            :param color:
             :param time_horizon:
             :param mesh:
             :param start_point:
@@ -61,7 +63,7 @@ class DijkstraPlanner(Planner):
             plotter.add_mesh(mesh, opacity=0.5)
             plotter.add_points(start_point, color='red', point_size=10)
             plotter.add_points(goal_point, color='green', point_size=10)
-            plotter.add_mesh(path, color='blue', line_width=3)
+            plotter.add_mesh(path, color=color, line_width=3)
             plotter.show_axes()
             plotter.show_bounds()
 

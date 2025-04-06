@@ -11,6 +11,7 @@ class Planner(ABC):
              goal_point: np.ndarray,
              plotter: Optional[pv.Plotter],
              mesh: pv.DataSet,
+             color="blue",
              time_horizon: float = 10.0,
              max_iterations: int = 1000) -> Optional[dict]:
         """Method to plan best path"""

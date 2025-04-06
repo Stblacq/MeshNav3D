@@ -3,7 +3,7 @@ import numpy as np
 import pyvista as pv
 import potpourri3d as pp3d
 
-from visualize.planners.planner import Planner
+from mesh_nav_3D.planners.planner import Planner
 
 
 class FlipOutPlanner(Planner):
@@ -11,6 +11,7 @@ class FlipOutPlanner(Planner):
              goal_point: np.ndarray,
              plotter: Optional[pv.Plotter],
              mesh: pv.DataSet,
+             color="blue",
              time_horizon: float = 10.0,
              max_iterations: int = 1000) -> Optional[dict]:
         """
@@ -21,6 +22,7 @@ class FlipOutPlanner(Planner):
             goal_point (np.ndarray): Goal point coordinates [x, y, z]
             plotter (Optional[pv.Plotter]): PyVista plotter for visualization
             mesh (pv.DataSet): Input mesh to plan on
+            color:
             time_horizon (float): Maximum time horizon for planning (default: 10.0)
             max_iterations (int): Maximum number of iterations for edge flipping (default: 1000)
 
@@ -106,7 +108,7 @@ class FlipOutPlanner(Planner):
             plotter.add_points(start_point, color='red', point_size=10)
             plotter.add_points(goal_point, color='green', point_size=10)
             if result['success']:
-                plotter.add_points(path_pts, color='blue', point_size=5)
+                plotter.add_points(path_pts, color=color, point_size=5)
             plotter.show_axes()
             plotter.show_bounds()
 
