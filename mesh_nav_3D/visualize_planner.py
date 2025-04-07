@@ -30,13 +30,9 @@ def instantiate_planner(planner: Union[str, Callable]) -> Optional[Planner]:
 
 
 def get_mesh_path(mesh_file_path: str) -> str:
-    if os.path.isabs(mesh_file_path):
-        final_mesh_path = mesh_file_path
-    else:
-        final_mesh_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                       "meshes", f"{mesh_file_path}.obj")
-    if not os.path.isfile(final_mesh_path):
-        raise FileNotFoundError(f"Mesh file not found: {final_mesh_path}")
+    if os.path.isabs(mesh_file_path): final_mesh_path = mesh_file_path
+    else: final_mesh_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "meshes", f"{mesh_file_path}.obj")
+    if not os.path.isfile(final_mesh_path): raise FileNotFoundError(f"Mesh file not found: {final_mesh_path}")
     return final_mesh_path
 
 
