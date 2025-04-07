@@ -15,6 +15,7 @@ tqdm = "^4.67.1"
 pygeodesic = "^0.1.11"
 potpourri3d = "^1.2.1"
 pydantic = "^2.11.2"
+psutil = "^7.0.0"
 
 [build-system]
 requires = ["poetry-core"]

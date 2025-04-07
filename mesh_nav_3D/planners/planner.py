@@ -2,15 +2,19 @@ from abc import ABC, abstractmethod
 from typing import Optional
 import numpy as np
 import pyvista as pv
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, computed_field
 import json
 from pathlib import Path
 
 class NumpyEncoder(json.JSONEncoder):
+    """Custom encoder for numpy data types"""
     def default(self, obj):
         if isinstance(obj, np.ndarray):
             return obj.tolist()
-        return json.JSONEncoder.default(self, obj)
+        if isinstance(obj, np.generic):
+            return obj.item()
+        return super().default(obj)
+
 
 class PlannerInput(BaseModel):
     """Pydantic model for planner input parameters."""
@@ -39,10 +43,10 @@ class PlannerOutput(BaseModel):
     start_point: np.ndarray
     goal_point: np.ndarray
     path_points: Optional[np.ndarray] = None
-    path_length: float = 0.0
     start_idx: Optional[int] = None
     goal_idx: Optional[int] = None
-    success: bool = False
+    execution_time: Optional[float] = None
+    memory_used_mb: Optional[float] = None
 
     @field_validator('start_point', 'goal_point')
     def validate_points(cls, value):
@@ -51,9 +55,32 @@ class PlannerOutput(BaseModel):
             raise ValueError("Points must be 3D coordinates [x, y, z]")
         return value
 
-    model_config = dict(
-        arbitrary_types_allowed=True
-    )
+    @computed_field
+    @property
+    def path_length(self) -> Optional[float]:
+        """Compute total path length if path_points are available."""
+        if self.path_points is None or len(self.path_points) < 2:
+            return None
+        segments = np.diff(self.path_points, axis=0)
+        return float(np.sum(np.linalg.norm(segments, axis=1)))
+
+    @computed_field
+    @property
+    def success(self) -> bool:
+        """Success is True if a valid path exists."""
+        return self.path_points is not None and len(self.path_points) >= 2
+
+    @computed_field
+    @property
+    def path_efficiency(self) -> Optional[float]:
+        """Compute path efficiency as redundant distance (extra vs direct)."""
+        if self.path_points is None or len(self.path_points) < 2:
+            return None
+        total_distance = np.sum(np.linalg.norm(np.diff(self.path_points, axis=0), axis=1))
+        direct_distance = np.linalg.norm(self.goal_point - self.start_point)
+        return float(total_distance - direct_distance)
+
+    model_config = dict(arbitrary_types_allowed=True,computed_fields = True)
 
     def save_to_file(self, filepath: str) -> None:
         """
@@ -64,22 +91,16 @@ class PlannerOutput(BaseModel):
         path = Path(filepath)
         path.parent.mkdir(parents=True, exist_ok=True)
 
-        # Get the data dictionary, excluding path_points
         data_dict = self.model_dump(exclude={'path_points'})
 
-        # Serialize with the custom encoder
         json_content = json.dumps(data_dict, indent=4, cls=NumpyEncoder)
-
-        # Write to JSON file
         json_path = path.with_suffix('.json')
         with open(json_path, 'w') as file:
             file.write(json_content)
 
-        # Save path_points separately if present
         if self.path_points is not None:
             npy_path = path.with_name(f"{path.name}_points").with_suffix('.npy')
             np.save(npy_path, self.path_points)
-
 
 class Planner(ABC):
     @abstractmethod

@@ -1,7 +1,9 @@
+import os
 import time
 from typing import Optional
 
 import numpy as np
+import psutil
 import pyvista as pv
 
 from mesh_nav_3D.planners.planner import Planner, PlannerInput, PlannerOutput
@@ -15,10 +17,10 @@ def cost_function(current_state, next_state, control, target, mesh):
     norm_a_to_b = np.linalg.norm(a_to_b)
     norm_b_to_target = np.linalg.norm(b_to_target)
 
-    if norm_a_to_b > 1e-6 and norm_b_to_target > 1e-6:  # Avoid division by zero
+    if norm_a_to_b > 1e-6 and norm_b_to_target > 1e-6:
         cos_theta = np.clip(np.dot(a_to_b / norm_a_to_b, b_to_target / norm_b_to_target), -1.0, 1.0)
     else:
-        cos_theta = 1.0  # Default to 1 (zero angle) if there's no meaningful direction
+        cos_theta = 1.0
 
     theta = np.arccos(cos_theta)
     theta_max = np.radians(60)
@@ -127,6 +129,10 @@ class MPPIPlanner(Planner):
         Returns:
             PlannerOutput: Object containing path information such as trajectory, controls, and execution time.
         """
+        process = psutil.Process(os.getpid())
+        start_time = time.time()
+        start_memory = process.memory_info().rss
+
         start_point = np.asarray(input_data.start_point).reshape(3)
         goal_point = np.asarray(input_data.goal_point).reshape(3)
         mesh = input_data.mesh
@@ -134,13 +140,11 @@ class MPPIPlanner(Planner):
         time_horizon = input_data.time_horizon
         max_iterations = input_data.max_iterations
 
-        dt = kwargs.get('dt',0.5)
+        dt = kwargs.get('dt', 0.5)
         trajectory = []
         control_efforts = []
-        x_current = np.concatenate([start_point, [0, 0]])  # [x, y, z, yaw, v]
-
-        trajectory.append(x_current.copy())
-        start_time = time.time()
+        x_current = np.concatenate([start_point, [0, 0]])
+        trajectory.append(x_current[:3].copy())
 
         for step in range(max_iterations):
             optimal_control = mppi(x_current, goal_point, dt,
@@ -150,35 +154,28 @@ class MPPIPlanner(Planner):
             x_current = dynamics(x_current, optimal_control, dt)
             x_proj = project_to_closest_face(x_current, mesh)
             x_current = x_proj
-            trajectory.append(x_current.copy())
+            trajectory.append(x_current[:3].copy())
             control_efforts.append(optimal_control)
 
-            if plotter is not None:
-                plotter.add_mesh(pv.Sphere(radius=0.3, center=x_current[:3]), color=color)
+            if plotter is not None: plotter.add_mesh(pv.Sphere(radius=0.3, center=x_current[:3]), color=color)
 
             if np.linalg.norm(x_current[:3] - goal_point) < 0.1:
-                if plotter is not None:
-                    plotter.add_mesh(pv.Sphere(radius=0.3, center=goal_point), color=color)
-                trajectory.append(np.concatenate([goal_point, [0, 0]]))
-                execution_time = time.time() - start_time
+                if plotter is not None: plotter.add_mesh(pv.Sphere(radius=0.3, center=goal_point), color=color)
+                trajectory.append(goal_point.copy())
 
                 return PlannerOutput(
                     start_point=start_point,
                     goal_point=goal_point,
                     path_points=np.array(trajectory),
-                    path_length=0,
-                    start_idx=0,
-                    goal_idx=0,
-                    success=True
+                    execution_time=time.time() - start_time,
+                    memory_used_mb=(process.memory_info().rss - start_memory) / 1024 / 1024,
                 )
+
         print("Max steps reached without reaching the goal.")
-        execution_time = time.time() - start_time
         return PlannerOutput(
-                    start_point=start_point,
-                    goal_point=goal_point,
-                    path_points=np.array(trajectory),
-                    path_length=0,
-                    start_idx=0,
-                    goal_idx=0,
-                    success=True
-                )
+            start_point=start_point,
+            goal_point=goal_point,
+            path_points=np.array(trajectory),
+            execution_time=time.time() - start_time,
+            memory_used_mb=(process.memory_info().rss - start_memory) / 1024 / 1024,
+        )

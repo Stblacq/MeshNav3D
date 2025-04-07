@@ -1,5 +1,8 @@
+import os
+import time
 from typing import Optional
 import numpy as np
+import psutil
 import pyvista as pv
 from heapq import heappush, heappop
 
@@ -20,6 +23,10 @@ class AStarPlanner(Planner):
         Returns:
             PlannerOutput: Object containing path information.
         """
+        process = psutil.Process(os.getpid())
+        start_time = time.time()
+        start_memory = process.memory_info().rss
+
         start_point = np.asarray(input_data.start_point).reshape(3)
         goal_point = np.asarray(input_data.goal_point).reshape(3)
         mesh = input_data.mesh
@@ -61,15 +68,14 @@ class AStarPlanner(Planner):
 
             if current_idx == goal_idx:
                 path_points = np.array(path)
-                path_length = g
                 output = PlannerOutput(
                     start_point=start_point,
                     goal_point=goal_point,
                     path_points=path_points,
-                    path_length=path_length,
                     start_idx=start_idx,
                     goal_idx=goal_idx,
-                    success=True
+                    execution_time=time.time() - start_time,
+                    memory_used_mb=(process.memory_info().rss - start_memory) / 1024 / 1024,
                 )
                 break
 
@@ -89,11 +95,8 @@ class AStarPlanner(Planner):
             output = PlannerOutput(
                 start_point=start_point,
                 goal_point=goal_point,
-                path_points=None,
-                path_length=0.0,
                 start_idx=start_idx,
                 goal_idx=goal_idx,
-                success=False
             )
 
         if plotter is not None:

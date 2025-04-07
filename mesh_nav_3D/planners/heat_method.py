@@ -1,5 +1,8 @@
+import os
+import time
 from typing import Optional
 import numpy as np
+import psutil
 import pyvista as pv
 import potpourri3d as pp3d
 from mesh_nav_3D.planners.planner import Planner, PlannerInput, PlannerOutput
@@ -16,6 +19,10 @@ class HeatMethodPlanner(Planner):
         Returns:
             PlannerOutput: Object containing path information
         """
+        process = psutil.Process(os.getpid())
+        start_time = time.time()
+        start_memory = process.memory_info().rss
+
         start_point = np.asarray(input_data.start_point).reshape(3)
         goal_point = np.asarray(input_data.goal_point).reshape(3)
         mesh = input_data.mesh
@@ -26,36 +33,20 @@ class HeatMethodPlanner(Planner):
         start_idx = np.argmin(np.linalg.norm(vertices - start_point, axis=1))
         goal_idx = np.argmin(np.linalg.norm(vertices - goal_point, axis=1))
 
-        try:
-            solver = pp3d.MeshHeatMethodDistanceSolver(vertices, faces, t_coef=1.0, use_robust=True)
-            distances = solver.compute_distance(goal_idx)
-            path_points = self._trace_geodesic_path(vertices, faces, distances, start_idx, goal_idx, max_iterations)
+        solver = pp3d.MeshHeatMethodDistanceSolver(vertices, faces, t_coef=1.0, use_robust=True)
+        distances = solver.compute_distance(goal_idx)
+        path_points = self._trace_geodesic_path(vertices, faces, distances, start_idx, goal_idx, max_iterations)
 
-            if path_points is not None and len(path_points) > 1:
-                path_length = float(np.sum(np.linalg.norm(np.diff(path_points, axis=0), axis=1)))
-            else:
-                path_length = 0.0
+        output = PlannerOutput(
+            start_point=start_point,
+            goal_point=goal_point,
+            path_points=path_points,
+            start_idx=start_idx,
+            goal_idx=goal_idx,
+            execution_time=time.time() - start_time,
+            memory_used_mb=(process.memory_info().rss - start_memory) / 1024 / 1024,
+        )
 
-            output = PlannerOutput(
-                start_point=start_point,
-                goal_point=goal_point,
-                path_points=path_points,
-                path_length=path_length,
-                start_idx=start_idx,
-                goal_idx=goal_idx,
-                success=path_points is not None
-            )
-        except Exception as e:
-            print(f"Heat method computation failed: {e}")
-            output = PlannerOutput(
-                start_point=start_point,
-                goal_point=goal_point,
-                path_points=None,
-                path_length=0.0,
-                start_idx=start_idx,
-                goal_idx=goal_idx,
-                success=False
-            )
 
         if plotter is not None:
             plotter.add_mesh(mesh, opacity=0.5)

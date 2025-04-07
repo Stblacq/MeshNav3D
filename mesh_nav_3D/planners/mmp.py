@@ -1,5 +1,8 @@
+import os
+import time
 from typing import Optional
 import numpy as np
+import psutil
 import pyvista as pv
 from pygeodesic import geodesic
 from mesh_nav_3D.planners.planner import Planner, PlannerInput, PlannerOutput
@@ -19,6 +22,10 @@ class MMPPlanner(Planner):
         Returns:
             PlannerOutput: Object containing path information
         """
+        process = psutil.Process(os.getpid())
+        start_time = time.time()
+        start_memory = process.memory_info().rss
+
         start_point = np.asarray(input_data.start_point).reshape(3)
         goal_point = np.asarray(input_data.goal_point).reshape(3)
         mesh = input_data.mesh
@@ -29,31 +36,19 @@ class MMPPlanner(Planner):
         start_idx = np.argmin(np.linalg.norm(vertices - start_point, axis=1))
         goal_idx = np.argmin(np.linalg.norm(vertices - goal_point, axis=1))
 
-        try:
-            distance, path = geo_alg.geodesicDistance(start_idx, goal_idx)
-            path_points = np.array(path)
-            path_length = float(distance)
+        distance, path = geo_alg.geodesicDistance(start_idx, goal_idx)
+        path_points = np.array(path)
 
-            output = PlannerOutput(
-                start_point=start_point,
-                goal_point=goal_point,
-                path_points=path_points,
-                path_length=path_length,
-                start_idx=start_idx,
-                goal_idx=goal_idx,
-                success=True
-            )
-        except Exception as e:
-            print(f"Geodesic computation failed: {e}")
-            output = PlannerOutput(
-                start_point=start_point,
-                goal_point=goal_point,
-                path_points=None,
-                path_length=0.0,
-                start_idx=start_idx,
-                goal_idx=goal_idx,
-                success=False
-            )
+        output = PlannerOutput(
+            start_point=start_point,
+            goal_point=goal_point,
+            path_points=path_points,
+            start_idx=start_idx,
+            goal_idx=goal_idx,
+            execution_time=time.time() - start_time,
+            memory_used_mb=(process.memory_info().rss - start_memory) / 1024 / 1024,
+        )
+
 
         if plotter is not None:
             plotter.add_mesh(mesh, opacity=0.5)
