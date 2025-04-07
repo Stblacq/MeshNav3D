@@ -3,7 +3,8 @@ import numpy as np
 import pyvista as pv
 import os
 from datetime import datetime
-from planners.planner import Planner
+from planners.planner import Planner, PlannerInput
+
 
 class BaseVisualizer(ABC):
     def __init__(self, mesh_file_path: str,
@@ -37,18 +38,6 @@ class BaseVisualizer(ABC):
         plotter.add_axes(interactive=True)
         return plotter
 
-    def save_to_npz(self, data: dict, planner_name: str) -> str:
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"plan_{planner_name}_{timestamp}.npz"
-        filepath = os.path.join(self.output_dir, filename)
-        save_dict = {}
-        for key, value in data.items():
-            if hasattr(value, 'points'):
-                save_dict[key] = np.asarray(value.points)
-            else:
-                save_dict[key] = np.asarray(value) if not isinstance(value, (int, float, str, bool)) else value
-        np.savez(filepath, **save_dict)
-        return filepath
 
     @abstractmethod
     def visualize(self):
@@ -74,16 +63,20 @@ class SinglePlannerVisualizer(BaseVisualizer):
             if len(self.clicked_points) == 2:
                 start, goal = self.clicked_points
                 self.clicked_points.clear()
-                plan_result = self.planner.plan(start, goal, plotter, pv_mesh)
-                # Save the planning result
-                filepath = self.save_to_npz(plan_result, self.planner.__class__.__name__)
+                planner_input = PlannerInput(start_point=start, goal_point=goal, mesh=pv_mesh)
+                plan_result = self.planner.plan(planner_input, plotter)
+
+                filepath = os.path.join(self.output_dir, f"plan_{self.planner.__class__.__name__}_{datetime.now()}")
+                plan_result.save_to_file(filepath)
                 print(f"Plan saved to: {filepath}")
+
                 plotter.add_points(start, color='red', point_size=5)
                 plotter.add_points(goal, color='green', point_size=5)
                 plotter.show()
 
         plotter.enable_point_picking(callback=callback, use_picker=True)
         plotter.show()
+
 
 class MultiPlannerVisualizer(BaseVisualizer):
     def __init__(self, mesh_file_path: str,
@@ -108,9 +101,14 @@ class MultiPlannerVisualizer(BaseVisualizer):
                 self.clicked_points.clear()
                 for i, planner in enumerate(self.planners):
                     color = colors[i % len(colors)]
-                    plan_result = planner.plan(start, goal, plotter, pv_mesh, color=color)
-                    filepath = self.save_to_npz(plan_result, planner.__class__.__name__)
+
+                    planner_input = PlannerInput(start_point=start, goal_point=goal, mesh=pv_mesh, color=color)
+                    plan_result = planner.plan(planner_input, plotter)
+
+                    filepath = os.path.join(self.output_dir, f"plan_{planner.__class__.__name__}_{datetime.now()}")
+                    plan_result.save_to_file(filepath)
                     print(f"Plan saved to: {filepath}")
+
                 plotter.add_points(start, color='red', point_size=5)
                 plotter.add_points(goal, color='green', point_size=5)
                 plotter.show()

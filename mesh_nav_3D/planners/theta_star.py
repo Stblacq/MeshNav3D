@@ -3,33 +3,25 @@ import numpy as np
 import pyvista as pv
 from heapq import heappush, heappop
 
-from mesh_nav_3D.planners.planner import Planner
-
+from mesh_nav_3D.planners.planner import Planner, PlannerInput, PlannerOutput
 
 class ThetaStarPlanner(Planner):
-    def plan(self, start_point: np.ndarray,
-             goal_point: np.ndarray,
-             plotter: Optional[pv.Plotter],
-             mesh: pv.DataSet,
-             color="blue",
-             time_horizon: float = 10.0,
-             max_iterations: int = 1000) -> Optional[dict]:
+    def plan(self, input_data: PlannerInput, plotter: Optional[pv.Plotter] = None, **_) -> PlannerOutput:
         """
         Compute a path between start and goal points on a mesh using Theta* algorithm.
 
         Args:
-            start_point (np.ndarray): Starting point coordinates [x, y, z]
-            goal_point (np.ndarray): Goal point coordinates [x, y, z]
+            input_data (PlannerInput): Input data containing start_point, goal_point, mesh, etc.
             plotter (Optional[pv.Plotter]): PyVista plotter for visualization
-            mesh (pv.DataSet): Input mesh to plan on
-            time_horizon (float): Maximum time horizon for planning (default: 10.0)
-            max_iterations (int): Maximum number of iterations (default: 1000)
-            color
+
         Returns:
-            Optional[dict]: Dictionary containing path information or None if path not found
+            PlannerOutput: Object containing path information
         """
-        start_point = np.asarray(start_point).reshape(3)
-        goal_point = np.asarray(goal_point).reshape(3)
+        start_point = np.asarray(input_data.start_point).reshape(3)
+        goal_point = np.asarray(input_data.goal_point).reshape(3)
+        mesh = input_data.mesh
+        color = getattr(input_data, 'color', 'blue')
+        max_iterations = getattr(input_data, 'max_iterations', 1000)
 
         if not mesh.is_all_triangles():
             mesh = mesh.triangulate()
@@ -61,28 +53,21 @@ class ThetaStarPlanner(Planner):
                 p2_idx (int): Index of second vertex
 
             Returns:
-                bool: True if line of sight exists (no intersections), False otherwise
+                bool: True if line of sight exists, False otherwise
             """
             p1 = vertices[p1_idx]
             p2 = vertices[p2_idx]
-
-            # Direction vector from p1 to p2
             direction = p2 - p1
             distance = np.linalg.norm(direction)
-            if distance < 1e-6:  # Points are too close
+            if distance < 1e-6:
                 return True
-
             direction = direction / distance
-
             start = p1 + direction * 1e-4
-
-            points, ind = mesh.ray_trace(start, p2)
-
-            if len(points) > 0:
-                for point in points:
-                    dist_to_intersection = np.linalg.norm(point - start)
-                    if dist_to_intersection < distance - 1e-4:  # Allow small tolerance near endpoint
-                        return False
+            points, _ = mesh.ray_trace(start, p2)
+            for point in points:
+                dist_to_intersection = np.linalg.norm(point - start)
+                if dist_to_intersection < distance - 1e-4:
+                    return False
             return True
 
         open_set = [(heuristic(start_idx), start_idx, 0, [start_vertex])]  # (f_score, vertex_idx, g_score, path)
@@ -103,26 +88,16 @@ class ThetaStarPlanner(Planner):
             if current_idx == goal_idx:
                 path_points = np.array(path)
                 path_length = g
-
-                result = {
-                    'path_points': path_points,
-                    'path_length': path_length,
-                    'start_idx': start_idx,
-                    'goal_idx': goal_idx,
-                    'success': True
-                }
-
-                if plotter is not None:
-                    plotter.add_mesh(mesh, opacity=0.5)
-                    plotter.add_points(start_point, color='red', point_size=10)
-                    plotter.add_points(goal_point, color='green', point_size=10)
-                    plotter.add_points(path_points, color=color, point_size=5)
-                    plotter.add_lines(np.vstack((path_points[:-1], path_points[1:])).T.reshape(-1, 3),
-                                      color=color)
-                    plotter.show_axes()
-                    plotter.show_bounds()
-
-                return result
+                output = PlannerOutput(
+                    start_point=start_point,
+                    goal_point=goal_point,
+                    path_points=path_points,
+                    path_length=path_length,
+                    start_idx=start_idx,
+                    goal_idx=goal_idx,
+                    success=True
+                )
+                break
 
             for next_idx, dist in adj_list[current_idx]:
                 if next_idx in visited:
@@ -132,8 +107,9 @@ class ThetaStarPlanner(Planner):
                     parent_idx = came_from[current_idx]
                     if line_of_sight(parent_idx, next_idx):
                         tentative_g = g_score[parent_idx] + np.linalg.norm(
-                            vertices[parent_idx] - vertices[next_idx])
-                        parent_path = path[:-1]  # Remove current vertex
+                            vertices[parent_idx] - vertices[next_idx]
+                        )
+                        parent_path = path[:-1]
                     else:
                         tentative_g = g + dist
                         parent_path = path
@@ -147,21 +123,26 @@ class ThetaStarPlanner(Planner):
                     f_score[next_idx] = tentative_g + heuristic(next_idx)
                     new_path = parent_path + [vertices[next_idx]]
                     heappush(open_set, (f_score[next_idx], next_idx, tentative_g, new_path))
-
-        result = {
-            'path_points': None,
-            'path_length': 0.0,
-            'travel_time': 0.0,
-            'start_idx': start_idx,
-            'goal_idx': goal_idx,
-            'success': False
-        }
+        else:
+            output = PlannerOutput(
+                start_point=start_point,
+                goal_point=goal_point,
+                path_points=None,
+                path_length=0.0,
+                start_idx=start_idx,
+                goal_idx=goal_idx,
+                success=False
+            )
 
         if plotter is not None:
             plotter.add_mesh(mesh, opacity=0.5)
             plotter.add_points(start_point, color='red', point_size=10)
             plotter.add_points(goal_point, color='green', point_size=10)
+            if output.success and output.path_points is not None:
+                plotter.add_points(output.path_points, color=color, point_size=5)
+                plotter.add_lines(np.vstack((output.path_points[:-1], output.path_points[1:])).T.reshape(-1, 3),
+                                  color=color)
             plotter.show_axes()
             plotter.show_bounds()
 
-        return result
+        return output

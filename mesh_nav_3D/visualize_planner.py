@@ -8,7 +8,6 @@ from planners import (Planner,
                       FastMarchingPlanner,
                       GreedyBFSPlanner,
                       HeatMethodPlanner,
-                      LogMPPIPlanner,
                       MMPPlanner,
                       MPPIPlanner,
                       ThetaStarPlanner)
@@ -43,7 +42,9 @@ def get_mesh_path(mesh_file_path: str) -> str:
 
 def visualize_multiple_planners(planners: List[Union[str, Callable]],
                                 mesh_file_path: str,
-                                up: str = "z") -> None:
+                                up: str = "z",
+                                output_dir: str = os.path.join(os.getcwd(), "outputs")
+                                ) -> None:
     planner_instances = []
     for planner in planners:
         planner_instance = instantiate_planner(planner)
@@ -51,17 +52,19 @@ def visualize_multiple_planners(planners: List[Union[str, Callable]],
         planner_instances.append(planner_instance)
     if not planner_instances:raise ValueError("No valid planners to visualize.")
     final_mesh_path = get_mesh_path(mesh_file_path)
-    visualizer = MultiPlannerVisualizer(final_mesh_path, planner_instances, up)
+    visualizer = MultiPlannerVisualizer(final_mesh_path, planner_instances, up, output_dir)
     visualizer.visualize()
 
 
 
 def visualize_single_planner(planner: Union[str, Callable],
                              mesh_file_path: str,
-                             up: str = "z") -> None:
+                             up: str = "z",
+                             output_dir: str = os.path.join(os.getcwd(), "outputs")
+                             ) -> None:
     planner_instance = instantiate_planner(planner)
     if planner_instance is None:
         return
     final_mesh_path = get_mesh_path(mesh_file_path)
-    visualizer = SinglePlannerVisualizer(final_mesh_path, planner_instance, up)
+    visualizer = SinglePlannerVisualizer(final_mesh_path, planner_instance, up,output_dir)
     visualizer.visualize()

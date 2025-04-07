@@ -3,34 +3,28 @@ import numpy as np
 import pyvista as pv
 import potpourri3d as pp3d
 
-from mesh_nav_3D.planners.planner import Planner
-
+from mesh_nav_3D.planners.planner import Planner, PlannerInput, PlannerOutput
 
 class FlipOutPlanner(Planner):
-    def plan(self, start_point: np.ndarray,
-             goal_point: np.ndarray,
-             plotter: Optional[pv.Plotter],
-             mesh: pv.DataSet,
-             color="blue",
-             time_horizon: float = 10.0,
-             max_iterations: int = 1000) -> Optional[dict]:
+    def plan(self,
+             input_data: PlannerInput,
+             plotter: Optional[pv.Plotter] = None, **_) -> PlannerOutput:
         """
         Compute a path between start and goal points on a mesh using EdgeFlipGeodesicSolver.
 
         Args:
-            start_point (np.ndarray): Starting point coordinates [x, y, z]
-            goal_point (np.ndarray): Goal point coordinates [x, y, z]
+            input_data (PlannerInput): Input data containing start_point, goal_point, mesh, etc.
             plotter (Optional[pv.Plotter]): PyVista plotter for visualization
-            mesh (pv.DataSet): Input mesh to plan on
-            color:
-            time_horizon (float): Maximum time horizon for planning (default: 10.0)
-            max_iterations (int): Maximum number of iterations for edge flipping (default: 1000)
 
         Returns:
-            Optional[dict]: Dictionary containing path information or None if path not found
+            PlannerOutput: Object containing path information
         """
-        start_point = np.asarray(start_point).reshape(3)
-        goal_point = np.asarray(goal_point).reshape(3)
+        # Extract parameters from input_data
+        start_point = np.asarray(input_data.start_point).reshape(3)
+        goal_point = np.asarray(input_data.goal_point).reshape(3)
+        mesh = input_data.mesh
+        time_horizon = getattr(input_data, 'time_horizon', 10.0)
+        max_iterations = getattr(input_data, 'max_iterations', 1000)
 
         V = np.asarray(mesh.points)
         F = np.asarray(mesh.faces.reshape(-1, 4)[:, 1:])
@@ -40,76 +34,44 @@ class FlipOutPlanner(Planner):
 
         try:
             path_solver = pp3d.EdgeFlipGeodesicSolver(V, F)
-        except Exception as e:
-            result = {
-                'path_points': None,
-                'path_length': 0.0,
-                'travel_time': 0.0,
-                'start_idx': start_idx,
-                'goal_idx': goal_idx,
-                'success': False,
-                'error': str(e)
-            }
-            if plotter is not None:
-                plotter.add_mesh(mesh, opacity=0.5)
-                plotter.add_points(start_point, color='red', point_size=10)
-                plotter.add_points(goal_point, color='green', point_size=10)
-                plotter.show_axes()
-                plotter.show_bounds()
-            return result
-
-        try:
             path_pts = path_solver.find_geodesic_path(
                 v_start=start_idx,
                 v_end=goal_idx,
                 max_iterations=max_iterations
             )
-        except Exception as e:
-            result = {
-                'path_points': None,
-                'path_length': 0.0,
-                'travel_time': 0.0,
-                'start_idx': start_idx,
-                'goal_idx': goal_idx,
-                'success': False,
-                'error': str(e)
-            }
-            if plotter is not None:
-                plotter.add_mesh(mesh, opacity=0.5)
-                plotter.add_points(start_point, color='red', point_size=10)
-                plotter.add_points(goal_point, color='green', point_size=10)
-                plotter.show_axes()
-                plotter.show_bounds()
-            return result
-        if path_pts.size == 0:
-            result = {
-                'path_points': None,
-                'path_length': 0.0,
-                'travel_time': 0.0,
-                'start_idx': start_idx,
-                'goal_idx': goal_idx,
-                'success': False
-            }
-        else:
+            if path_pts.size == 0:
+                raise ValueError("Path not found")
+
             path_diffs = np.diff(path_pts, axis=0)
             path_length = np.sum(np.linalg.norm(path_diffs, axis=1))
-            travel_time = path_length / time_horizon if time_horizon > 0 else 0.0
 
-            result = {
-                'path_points': path_pts,
-                'path_length': path_length,
-                'travel_time': travel_time,
-                'start_idx': start_idx,
-                'goal_idx': goal_idx,
-                'success': True
-            }
+            output = PlannerOutput(
+                start_point=start_point,
+                goal_point=goal_point,
+                path_points=path_pts,
+                path_length=path_length,
+                start_idx=start_idx,
+                goal_idx=goal_idx,
+                success=True
+            )
+        except Exception:
+            output = PlannerOutput(
+                start_point=start_point,
+                goal_point=goal_point,
+                path_points=None,
+                path_length=0.0,
+                start_idx=start_idx,
+                goal_idx=goal_idx,
+                success=False
+            )
+
         if plotter is not None:
             plotter.add_mesh(mesh, opacity=0.5)
             plotter.add_points(start_point, color='red', point_size=10)
             plotter.add_points(goal_point, color='green', point_size=10)
-            if result['success']:
-                plotter.add_points(path_pts, color=color, point_size=5)
+            if output.success and output.path_points is not None:
+                plotter.add_points(output.path_points, color=input_data.color, point_size=5)
             plotter.show_axes()
             plotter.show_bounds()
 
-        return result
+        return output

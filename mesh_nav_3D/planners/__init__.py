@@ -4,7 +4,6 @@ from mesh_nav_3D.planners.edge_flip import FlipOutPlanner
 from mesh_nav_3D.planners.fmm import FastMarchingPlanner
 from mesh_nav_3D.planners.greedy_bfs import GreedyBFSPlanner
 from mesh_nav_3D.planners.heat_method import HeatMethodPlanner
-from mesh_nav_3D.planners.log_mppi import LogMPPIPlanner
 from mesh_nav_3D.planners.mmp import MMPPlanner
 from mesh_nav_3D.planners.mppi import MPPIPlanner
 from mesh_nav_3D.planners.planner import Planner

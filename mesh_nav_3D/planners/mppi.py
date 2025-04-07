@@ -4,7 +4,7 @@ from typing import Optional
 import numpy as np
 import pyvista as pv
 
-from mesh_nav_3D.planners.planner import Planner
+from mesh_nav_3D.planners.planner import Planner, PlannerInput, PlannerOutput
 
 
 def cost_function(current_state, next_state, control, target, mesh):
@@ -103,14 +103,11 @@ def project_to_closest_face(x, mesh):
     closest_point = surface.points[closest_point_id]
     closest_normal = surface.point_normals[closest_point_id]
 
-    # Plane equation: Ax + By + Cz + D = 0
     A, B, C = closest_normal
     D = -np.dot(closest_normal, closest_point)
 
-    # Distance from point to plane
     distance_to_plane = (A * x[0] + B * x[1] + C * x[2] + D) / np.sqrt(A ** 2 + B ** 2 + C ** 2)
 
-    # Projected point
     projected_point = x[:3] - distance_to_plane * closest_normal
 
     x[:3] = projected_point
@@ -118,24 +115,34 @@ def project_to_closest_face(x, mesh):
 
 
 class MPPIPlanner(Planner):
-    def plan(self, start_point: np.ndarray,
-             goal_point: np.ndarray,
-             plotter: Optional[pv.Plotter],
-             mesh: pv.DataSet,
-             color="blue",
-             time_horizon: float = 10.0,
-             max_iterations: int = 1000) -> Optional[dict]:
+    def plan(self, input_data: PlannerInput,
+             plotter: Optional[pv.Plotter] = None, **kwargs) -> PlannerOutput:
+        """
+        Compute a path between start and goal points on a mesh using Model Predictive Path Integral (MPPI) control.
 
-        dt = 0.5
-        max_steps = 100000
+        Args:
+            input_data (PlannerInput): Input data containing start_point, goal_point, mesh, etc.
+            plotter (Optional[pv.Plotter]): PyVista plotter for visualization.
+
+        Returns:
+            PlannerOutput: Object containing path information such as trajectory, controls, and execution time.
+        """
+        start_point = np.asarray(input_data.start_point).reshape(3)
+        goal_point = np.asarray(input_data.goal_point).reshape(3)
+        mesh = input_data.mesh
+        color = input_data.color
+        time_horizon = input_data.time_horizon
+        max_iterations = input_data.max_iterations
+
+        dt = kwargs.get('dt',0.5)
         trajectory = []
         control_efforts = []
-        x_current = np.concatenate([start_point, [0, 0]])  # start_point was 3D, now adding yaw=0, v=0
+        x_current = np.concatenate([start_point, [0, 0]])  # [x, y, z, yaw, v]
 
         trajectory.append(x_current.copy())
         start_time = time.time()
 
-        for step in range(max_steps):
+        for step in range(max_iterations):
             optimal_control = mppi(x_current, goal_point, dt,
                                    mesh, num_samples=100,
                                    time_horizon=time_horizon,
@@ -145,18 +152,33 @@ class MPPIPlanner(Planner):
             x_current = x_proj
             trajectory.append(x_current.copy())
             control_efforts.append(optimal_control)
-            plotter.add_mesh(pv.Sphere(radius=0.3, center=x_current[:3]), color=color)
+
+            if plotter is not None:
+                plotter.add_mesh(pv.Sphere(radius=0.3, center=x_current[:3]), color=color)
 
             if np.linalg.norm(x_current[:3] - goal_point) < 0.1:
-                plotter.add_mesh(pv.Sphere(radius=0.3, center=goal_point), color=color)
+                if plotter is not None:
+                    plotter.add_mesh(pv.Sphere(radius=0.3, center=goal_point), color=color)
                 trajectory.append(np.concatenate([goal_point, [0, 0]]))
                 execution_time = time.time() - start_time
 
-                return {
-                    "trajectory": trajectory,
-                    "controls": control_efforts,
-                    "execution_time": execution_time,
-                }
-
+                return PlannerOutput(
+                    start_point=start_point,
+                    goal_point=goal_point,
+                    path_points=np.array(trajectory),
+                    path_length=0,
+                    start_idx=0,
+                    goal_idx=0,
+                    success=True
+                )
         print("Max steps reached without reaching the goal.")
-        return None
+        execution_time = time.time() - start_time
+        return PlannerOutput(
+                    start_point=start_point,
+                    goal_point=goal_point,
+                    path_points=np.array(trajectory),
+                    path_length=0,
+                    start_idx=0,
+                    goal_idx=0,
+                    success=True
+                )

@@ -1,90 +1,72 @@
 from typing import Optional
-
 import numpy as np
 import pyvista as pv
 import potpourri3d as pp3d
-
-from mesh_nav_3D.planners.planner import Planner
-
+from mesh_nav_3D.planners.planner import Planner, PlannerInput, PlannerOutput
 
 class HeatMethodPlanner(Planner):
-    def plan(self, start_point: np.ndarray,
-             goal_point: np.ndarray,
-             plotter: Optional[pv.Plotter],
-             mesh: pv.DataSet,
-             color="blue",
-             time_horizon: float = 10.0,
-             max_iterations: int = 1000) -> Optional[dict]:
+    def plan(self, input_data: PlannerInput, plotter: Optional[pv.Plotter] = None, **_) -> PlannerOutput:
         """
         Compute a geodesic path between start and goal points on a mesh using the heat method.
 
         Args:
-            start_point (np.ndarray): Starting point coordinates [x, y, z]
-            goal_point (np.ndarray): Goal point coordinates [x, y, z]
+            input_data (PlannerInput): Object containing start_point, goal_point, mesh, color, etc.
             plotter (Optional[pv.Plotter]): PyVista plotter for visualization
-            mesh (pv.DataSet): Input mesh to plan on (must be a triangular mesh)
-            time_horizon (float): Maximum time horizon for planning (default: 10.0)
-            max_iterations (int): Maximum number of iterations for path tracing (default: 1000)
-            color:
 
         Returns:
-            Optional[dict]: Dictionary containing path information or None if path not found
+            PlannerOutput: Object containing path information
         """
-        start_point = np.asarray(start_point).reshape(3)
-        goal_point = np.asarray(goal_point).reshape(3)
+        start_point = np.asarray(input_data.start_point).reshape(3)
+        goal_point = np.asarray(input_data.goal_point).reshape(3)
+        mesh = input_data.mesh
+        max_iterations = input_data.max_iterations
 
         vertices = np.asarray(mesh.points)
         faces = np.asarray(mesh.faces).reshape(-1, 4)[:, 1:]
-
         start_idx = np.argmin(np.linalg.norm(vertices - start_point, axis=1))
         goal_idx = np.argmin(np.linalg.norm(vertices - goal_point, axis=1))
 
         try:
             solver = pp3d.MeshHeatMethodDistanceSolver(vertices, faces, t_coef=1.0, use_robust=True)
-
             distances = solver.compute_distance(goal_idx)
-
-            path_points = self._trace_geodesic_path(
-                vertices, faces, distances, start_idx, goal_idx, max_iterations
-            )
+            path_points = self._trace_geodesic_path(vertices, faces, distances, start_idx, goal_idx, max_iterations)
 
             if path_points is not None and len(path_points) > 1:
                 path_length = float(np.sum(np.linalg.norm(np.diff(path_points, axis=0), axis=1)))
             else:
                 path_length = 0.0
 
-            travel_time = path_length / time_horizon if time_horizon > 0 else 0.0
-
-            result = {
-                'path_points': path_points,
-                'path_length': path_length,
-                'travel_time': travel_time,
-                'start_idx': start_idx,
-                'goal_idx': goal_idx,
-                'success': path_points is not None
-            }
-
+            output = PlannerOutput(
+                start_point=start_point,
+                goal_point=goal_point,
+                path_points=path_points,
+                path_length=path_length,
+                start_idx=start_idx,
+                goal_idx=goal_idx,
+                success=path_points is not None
+            )
         except Exception as e:
             print(f"Heat method computation failed: {e}")
-            result = {
-                'path_points': None,
-                'path_length': 0.0,
-                'travel_time': 0.0,
-                'start_idx': start_idx,
-                'goal_idx': goal_idx,
-                'success': False
-            }
+            output = PlannerOutput(
+                start_point=start_point,
+                goal_point=goal_point,
+                path_points=None,
+                path_length=0.0,
+                start_idx=start_idx,
+                goal_idx=goal_idx,
+                success=False
+            )
 
         if plotter is not None:
             plotter.add_mesh(mesh, opacity=0.5)
             plotter.add_points(start_point, color='red', point_size=10)
             plotter.add_points(goal_point, color='green', point_size=10)
-            if result['success'] and result['path_points'] is not None:
-                plotter.add_points(result['path_points'], color=color, point_size=5)
+            if output.success and output.path_points is not None:
+                plotter.add_points(output.path_points, color=input_data.color, point_size=5)
             plotter.show_axes()
             plotter.show_bounds()
 
-        return result
+        return output
 
     def _trace_geodesic_path(self, vertices: np.ndarray, faces: np.ndarray,
                              distances: np.ndarray, start_idx: int, goal_idx: int,
