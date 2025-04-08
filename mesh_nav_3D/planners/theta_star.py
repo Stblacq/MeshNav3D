@@ -30,7 +30,7 @@ class ThetaStarPlanner(Planner):
         color = getattr(input_data, 'color', 'blue')
         max_iterations = getattr(input_data, 'max_iterations', 1000)
 
-        if not mesh.is_all_triangles():
+        if not mesh.is_all_triangles:
             mesh = mesh.triangulate()
 
         edges_polydata = mesh.extract_all_edges()

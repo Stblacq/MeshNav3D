@@ -8,20 +8,19 @@ import json
 from pathlib import Path
 
 
-def get_mesh_path(mesh_file_path: str) -> str:
-    if os.path.isabs(mesh_file_path): final_mesh_path = mesh_file_path
-    else: final_mesh_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                                         "meshes", f"{mesh_file_path}.obj")
-    if not os.path.isfile(final_mesh_path): raise FileNotFoundError(f"Mesh file not found: {final_mesh_path}")
-    return final_mesh_path
+def mesh_loader(mesh_file_path):
+    if os.path.isabs(mesh_file_path): final_path = mesh_file_path
+    else: final_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                    "meshes", f"{mesh_file_path}.obj")
+    if not os.path.isfile(final_path): raise FileNotFoundError(f"Mesh file not found: {final_path}")
+    return pv.read(final_path)
+
 
 class NumpyEncoder(json.JSONEncoder):
     """Custom encoder for numpy data types"""
     def default(self, obj):
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        if isinstance(obj, np.generic):
-            return obj.item()
+        if isinstance(obj, np.ndarray): return obj.tolist()
+        if isinstance(obj, np.generic): return obj.item()
         return super().default(obj)
 
 
@@ -38,8 +37,9 @@ class PlannerConfig(BaseModel):
     model_config = dict(arbitrary_types_allowed=True)
 
     def model_post_init(self, __context):
-        final_path = get_mesh_path(self.mesh_file_path)
-        self.mesh = pv.read(final_path)
+        mesh = mesh_loader(self.mesh_file_path)
+        self.mesh = mesh
+
 
 class PlannerInput(PlannerConfig):
     """Pydantic model for planner input parameters."""

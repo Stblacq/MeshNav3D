@@ -1,33 +1,10 @@
 import os
-from typing import Union, Callable, Optional, List
+from typing import Union, Callable, List
 
 from mesh_nav_3D.planners.planner import PlannerConfig
-from planners import (Planner,
-                      AStarPlanner,
-                      DijkstraPlanner,
-                      FlipOutPlanner,
-                      FastMarchingPlanner,
-                      GreedyBFSPlanner,
-                      HeatMethodPlanner,
-                      MMPPlanner,
-                      MPPIPlanner,
-                      ThetaStarPlanner)
+from planners import  instantiate_planner
 
 from mesh_nav_3D.visualizer import SinglePlannerVisualizer, MultiPlannerVisualizer
-
-
-def snake_to_pascal(snake_str: str) -> str:
-    return ''.join(word.capitalize() for word in snake_str.split('_'))
-
-
-
-def instantiate_planner(planner: Union[str, Callable]) -> Optional[Planner]:
-    try:
-        class_name = snake_to_pascal(planner) if isinstance(planner, str) and '_' in planner else planner
-        return globals()[class_name]() if isinstance(planner, str) else planner()
-    except Exception as e:
-        print(f"Error instantiating planner {planner}: {str(e)}")
-        return None
 
 
 def get_mesh_path(mesh_file_path: str) -> str:
