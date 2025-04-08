@@ -3,115 +3,102 @@ import numpy as np
 import pyvista as pv
 import os
 from datetime import datetime
-from planners.planner import Planner, PlannerInput
+from planners.planner import Planner, PlannerInput, PlannerConfig
 
 
 class BaseVisualizer(ABC):
-    def __init__(self, mesh_file_path: str,
-                 up: str = "z",
-                 output_dir: str = os.path.join(os.getcwd(), "outputs")):
-        self.clicked_points = []
-        self.mesh_file_path = mesh_file_path
-        self.output_dir = output_dir
-        self.transformation_matrix = self.get_up_axis_transform(up)
+    def __init__(self, planner_config: PlannerConfig):
+        self.mesh = planner_config.mesh
+        self.output_dir = planner_config.output_dir
+        self.transform = self._get_transform(planner_config.up)
+        self.planner_config = planner_config
         os.makedirs(self.output_dir, exist_ok=True)
 
     @staticmethod
-    def get_up_axis_transform(up: str) -> np.ndarray:
-        up = up.lower()
-        if up not in 'xyz':
+    def _get_transform(up: str) -> np.ndarray:
+        if up.lower() not in 'xyz':
             raise ValueError("up must be 'x', 'y', or 'z'")
-        transformation_matrix = np.eye(4)
-        i = 'xyz'.index(up)
-        transformation_matrix[[2, i]] = transformation_matrix[[i, 2]]
-        return transformation_matrix
+        i = 'xyz'.index(up.lower())
+        t = np.eye(4)
+        t[[2, i]] = t[[i, 2]]
+        return t
 
-    def set_up_mesh(self, pv_mesh):
-        pv_mesh = pv_mesh.transform(self.transformation_matrix)
-        pv_mesh["Elevation"] = pv_mesh.points[:, 2]
+    def setup_plotter(self):
+        mesh = self.mesh.transform(self.transform)
+        mesh["Elevation"] = mesh.points[:, 2]
         plotter = pv.Plotter()
-        plotter.add_mesh(pv_mesh,
-                         scalars="Elevation",
-                         cmap="terrain",
-                         color='lightblue',
-                         show_edges=True)
+        plotter.add_mesh(mesh, scalars="Elevation", cmap="terrain", color='lightblue', show_edges=True)
         plotter.add_axes(interactive=True)
+        self.mesh = mesh
         return plotter
 
-
     @abstractmethod
-    def visualize(self):
-        pass
+    def visualize(self): pass
+
 
 class SinglePlannerVisualizer(BaseVisualizer):
-    def __init__(self, mesh_file_path: str,
-                 planner: Planner,
-                 up: str = "z",
-                 output_dir: str = os.path.join(os.getcwd(), "outputs")
-                 ):
-        super().__init__(mesh_file_path, up, output_dir)
+    def __init__(self, planner: Planner, config: PlannerConfig):
         self.planner = planner
-        self.visualize()
+        super().__init__(config)
 
     def visualize(self):
-        pv_mesh = pv.read(self.mesh_file_path)
-        plotter = self.set_up_mesh(pv_mesh)
+        plotter = self.setup_plotter()
+        points = []
 
-        def callback(point, _):
-            self.clicked_points.append(point)
-            plotter.add_mesh(pv.PolyData(point), color='red', point_size=2)
-            if len(self.clicked_points) == 2:
-                start, goal = self.clicked_points
-                self.clicked_points.clear()
-                planner_input = PlannerInput(start_point=start, goal_point=goal, mesh=pv_mesh)
-                plan_result = self.planner.plan(planner_input, plotter)
+        def callback(p, _):
+            points.append(p)
+            plotter.add_mesh(pv.PolyData(p), color='red', point_size=2)
+            if len(points) < 2:
+                return
+            start, goal = points[:2]
+            points.clear()
 
-                filepath = os.path.join(self.output_dir, f"plan_{self.planner.__class__.__name__}_{datetime.now()}")
-                plan_result.save_to_file(filepath)
-                print(f"Plan saved to: {filepath}")
+            plan_input = PlannerInput(start_point=start, goal_point=goal, **self.planner_config.model_dump())
+            result = self.planner.plan(plan_input, plotter)
+            path = os.path.join(self.output_dir, f"plan_{self.planner.__class__.__name__}_{datetime.now():%Y%m%d_%H%M%S}")
+            result.save_to_file(path)
+            print(f"Plan saved to: {path}")
 
-                plotter.add_points(start, color='red', point_size=5)
-                plotter.add_points(goal, color='green', point_size=5)
-                plotter.show()
+            plotter.add_points(start, color='red', point_size=5)
+            plotter.add_points(goal, color='green', point_size=5)
+            plotter.show()
 
         plotter.enable_point_picking(callback=callback, use_picker=True)
         plotter.show()
 
 
 class MultiPlannerVisualizer(BaseVisualizer):
-    def __init__(self, mesh_file_path: str,
-                 planners: list[Planner],
-                 up: str = "z",
-                 output_dir: str = os.path.join(os.getcwd(), "outputs")
-                 ):
-        super().__init__(mesh_file_path, up, output_dir)
+    def __init__(self, planners: list[Planner], config: PlannerConfig):
         self.planners = planners
-        self.visualize()
+        super().__init__(config)
 
     def visualize(self):
-        pv_mesh = pv.read(self.mesh_file_path)
-        plotter = self.set_up_mesh(pv_mesh)
+        plotter = self.setup_plotter()
+        points = []
         colors = ["blue", "yellow", "purple", "orange", "cyan", "magenta"]
 
-        def callback(point, _):
-            self.clicked_points.append(point)
-            plotter.add_mesh(pv.PolyData(point), color='red', point_size=2)
-            if len(self.clicked_points) == 2:
-                start, goal = self.clicked_points
-                self.clicked_points.clear()
-                for i, planner in enumerate(self.planners):
-                    color = colors[i % len(colors)]
+        def callback(p, _):
+            points.append(p)
+            plotter.add_mesh(pv.PolyData(p), color='red', point_size=2)
+            if len(points) < 2:
+                return
+            start, goal = points[:2]
+            points.clear()
 
-                    planner_input = PlannerInput(start_point=start, goal_point=goal, mesh=pv_mesh, color=color)
-                    plan_result = planner.plan(planner_input, plotter)
+            for i, planner in enumerate(self.planners):
+                color = colors[i % len(colors)]
+                self.planner_config.color = color
+                plan_input = PlannerInput(start_point=start,
+                                          goal_point=goal,
+                                          **self.planner_config.model_dump())
+                result = planner.plan(plan_input, plotter)
+                path = os.path.join(self.output_dir, f"plan_{planner.__class__.__name__}_{datetime.now():%Y%m%d_%H%M%S}")
+                result.save_to_file(path)
+                print(f"Plan saved to: {path}")
 
-                    filepath = os.path.join(self.output_dir, f"plan_{planner.__class__.__name__}_{datetime.now()}")
-                    plan_result.save_to_file(filepath)
-                    print(f"Plan saved to: {filepath}")
-
-                plotter.add_points(start, color='red', point_size=5)
-                plotter.add_points(goal, color='green', point_size=5)
-                plotter.show()
+            plotter.add_points(start, color='red', point_size=5)
+            plotter.add_points(goal, color='green', point_size=5)
+            plotter.show()
 
         plotter.enable_point_picking(callback=callback, use_picker=True)
         plotter.show()

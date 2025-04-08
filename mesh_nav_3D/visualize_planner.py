@@ -1,6 +1,7 @@
 import os
 from typing import Union, Callable, Optional, List
 
+from mesh_nav_3D.planners.planner import PlannerConfig
 from planners import (Planner,
                       AStarPlanner,
                       DijkstraPlanner,
@@ -36,31 +37,14 @@ def get_mesh_path(mesh_file_path: str) -> str:
     return final_mesh_path
 
 
-def visualize_multiple_planners(planners: List[Union[str, Callable]],
-                                mesh_file_path: str,
-                                up: str = "z",
-                                output_dir: str = os.path.join(os.getcwd(), "outputs")
-                                ) -> None:
-    planner_instances = []
-    for planner in planners:
-        planner_instance = instantiate_planner(planner)
-        if planner_instance is None: continue
-        planner_instances.append(planner_instance)
-    if not planner_instances:raise ValueError("No valid planners to visualize.")
-    final_mesh_path = get_mesh_path(mesh_file_path)
-    visualizer = MultiPlannerVisualizer(final_mesh_path, planner_instances, up, output_dir)
-    visualizer.visualize()
+def visualize_single_planner(planner: Union[str, Callable], config: PlannerConfig):
+    instance = instantiate_planner(planner)
+    if instance:
+        SinglePlannerVisualizer(instance, config).visualize()
 
 
-
-def visualize_single_planner(planner: Union[str, Callable],
-                             mesh_file_path: str,
-                             up: str = "z",
-                             output_dir: str = os.path.join(os.getcwd(), "outputs")
-                             ) -> None:
-    planner_instance = instantiate_planner(planner)
-    if planner_instance is None:
-        return
-    final_mesh_path = get_mesh_path(mesh_file_path)
-    visualizer = SinglePlannerVisualizer(final_mesh_path, planner_instance, up,output_dir)
-    visualizer.visualize()
+def visualize_multiple_planners(planners: List[Union[str, Callable]], config: PlannerConfig):
+    instances = [instantiate_planner(planner) for planner in planners if instantiate_planner(planner)]
+    if not instances:
+        raise ValueError("No valid planners to visualize.")
+    MultiPlannerVisualizer(instances, config).visualize()

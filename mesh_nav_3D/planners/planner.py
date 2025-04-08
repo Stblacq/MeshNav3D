@@ -1,10 +1,19 @@
+import os
 from abc import ABC, abstractmethod
 from typing import Optional
 import numpy as np
 import pyvista as pv
-from pydantic import BaseModel, field_validator, computed_field
+from pydantic import BaseModel, field_validator, computed_field, Field
 import json
 from pathlib import Path
+
+
+def get_mesh_path(mesh_file_path: str) -> str:
+    if os.path.isabs(mesh_file_path): final_mesh_path = mesh_file_path
+    else: final_mesh_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                         "meshes", f"{mesh_file_path}.obj")
+    if not os.path.isfile(final_mesh_path): raise FileNotFoundError(f"Mesh file not found: {final_mesh_path}")
+    return final_mesh_path
 
 class NumpyEncoder(json.JSONEncoder):
     """Custom encoder for numpy data types"""
@@ -16,14 +25,26 @@ class NumpyEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
-class PlannerInput(BaseModel):
+class PlannerConfig(BaseModel):
+    """Base configuration shared across planner models."""
+    mesh_file_path: str
+    mesh: pv.DataSet = Field(init=False, default=None)
+    color: str = "blue"
+    time_horizon: float = 10.0
+    max_iterations: int = 1000
+    up: str = "z"
+    output_dir: str = "outputs"
+
+    model_config = dict(arbitrary_types_allowed=True)
+
+    def model_post_init(self, __context):
+        final_path = get_mesh_path(self.mesh_file_path)
+        self.mesh = pv.read(final_path)
+
+class PlannerInput(PlannerConfig):
     """Pydantic model for planner input parameters."""
     start_point: np.ndarray
     goal_point: np.ndarray
-    mesh: pv.DataSet
-    color: str = "blue"
-    time_horizon: int = 10.0
-    max_iterations: int = 1000
 
     @classmethod
     @field_validator('start_point', 'goal_point')
@@ -32,11 +53,6 @@ class PlannerInput(BaseModel):
         if value.shape != (3,):
             raise ValueError("Points must be 3D coordinates [x, y, z]")
         return value
-
-    model_config = dict(
-        arbitrary_types_allowed=True
-    )
-
 
 class PlannerOutput(BaseModel):
     """Pydantic model for planner output results."""

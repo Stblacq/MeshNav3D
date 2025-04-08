@@ -114,7 +114,6 @@ class FastMarchingPlanner(Planner):
                 )
 
         if plotter is not None:
-            plotter.add_mesh(mesh, opacity=0.5)
             plotter.add_points(start_point, color='red', point_size=10)
             plotter.add_points(goal_point, color='green', point_size=10)
             if output.success and output.path_points is not None:

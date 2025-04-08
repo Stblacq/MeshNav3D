@@ -33,7 +33,6 @@ class DijkstraPlanner(Planner):
         )
 
         if plotter is not None:
-            plotter.add_mesh(input_data.mesh, opacity=0.5)
             plotter.add_points(input_data.start_point, color='red', point_size=10)
             plotter.add_points(input_data.goal_point, color='green', point_size=10)
             plotter.add_mesh(path, color=input_data.color, line_width=3)
