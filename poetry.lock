@@ -799,6 +799,26 @@ dev = ["abi3audit", "black (==24.10.0)", "check-manifest", "coverage", "packagin
 test = ["pytest", "pytest-xdist", "setuptools"]
 
 [[package]]
+name = "pybullet"
+version = "3.2.7"
+description = "Official Python Interface for the Bullet Physics SDK specialized for Robotics Simulation and Reinforcement Learning"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "pybullet-3.2.7-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:814e6b0c035a634b5c46f69065effb085cc451886dda4140576be2f34b461940"},
+    {file = "pybullet-3.2.7-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5d858abf7c12a21ef3ed351cf81dac1b5e486ec25c9ab59bfc84beb89034edff"},
+    {file = "pybullet-3.2.7-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ab4b93e47fbea981e4a85c07083288a0af897bfedc1fd005636201c5b36e9a87"},
+    {file = "pybullet-3.2.7-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f6a23e6e8d59924a7eca3cc1709fac7353a585c4958d610729ca418f3e633a55"},
+    {file = "pybullet-3.2.7-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:637be83db2405d4f058a1125bd56bc954f355ff15e519a6738c00d4be3741c4e"},
+    {file = "pybullet-3.2.7-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:438a95e9d53af5b2e9bbf7b12e1846485e58532b57580c5290dee305fa8b4a6b"},
+    {file = "pybullet-3.2.7-pp37-pypy37_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:3138029e00813d8bde6fa2068c8fde44c24adb29b04d39524ca29afc4203e00a"},
+    {file = "pybullet-3.2.7-pp38-pypy38_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:71e97acbce9a0dab14dc4942bf2134ed50c130c32a85ee18791c9bd08bc953d2"},
+    {file = "pybullet-3.2.7-pp39-pypy39_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5457a2f32ea718bf09c5391a6b7695044c80ac6416571388caa56a0ccf67ba9a"},
+    {file = "pybullet-3.2.7.tar.gz", hash = "sha256:042879db8d101ac7590dee475fc6aded508b85fe1273fdbbfde1d88bd200e14f"},
+]
+
+[[package]]
 name = "pydantic"
 version = "2.11.3"
 description = "Data validation using Python type hints"
@@ -1248,4 +1268,4 @@ web = ["wslink (>=1.0.4)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "277837cbc797dcb87ad49a92c9905f0504d71e3b90c55f16e102a832238b3d7d"
+content-hash = "eec8a792b96cc1a32a8254caed9da50ab411d79c760446c04e8f482d50b6be14"
