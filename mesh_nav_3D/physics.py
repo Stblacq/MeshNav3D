@@ -1,3 +1,5 @@
+import os
+
 import pybullet as p
 import numpy as np
 from time import sleep
@@ -16,7 +18,7 @@ CAMERA_CONFIG = {
     'pitch_max': 89.0
 }
 MESH_CONFIG = {
-    'file': "/home/otto/PycharmProjects/learning_pybullet/examples/mesh/terrain_mesh.obj",
+    'file': os.path.join(os.path.dirname(os.path.abspath(__file__)),"meshes", "terrain_mesh.obj"),
     'scale': [3, 3, 3]
 }
 BALL_CONFIG = {
