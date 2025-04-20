@@ -2,7 +2,7 @@ import os
 from typing import Union, Callable, List
 
 from mesh_nav_3D.planners.planner import PlannerConfig
-from planners import  instantiate_planner
+from mesh_nav_3D.planners import  instantiate_planner
 
 from mesh_nav_3D.visualizer import SinglePlannerVisualizer, MultiPlannerVisualizer
 

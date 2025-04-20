@@ -1,13 +1,20 @@
 [tool.poetry]
-name = "visualize-mesh"
+name = "mesh_nav_3D"
 version = "0.1.0"
 description = ""
 authors = ["Otto Jerome <o.jerome@ieee.org>"]
 maintainers = [
     "Otto Jerome <o.jerome@ieee.org>",
+    "Christian Okeme  christian.okeme@fin3.tech",
+    "Christian Bassey  c.bassey@innopolis.university",
 ]
-package-mode = false
+package-mode = true
 readme = "README.MD"
+license = "MIT"
+packages = [
+    { include = "mesh_nav_3D" },
+]
+
 [tool.poetry.dependencies]
 python = "^3.12"
 pyvista = "^0.44.2"
@@ -20,6 +27,3 @@ psutil = "^7.0.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
-visualize = 'visualize.run_example'

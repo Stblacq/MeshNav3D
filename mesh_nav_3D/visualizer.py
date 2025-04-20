@@ -3,7 +3,7 @@ import numpy as np
 import pyvista as pv
 import os
 from datetime import datetime
-from planners.planner import Planner, PlannerInput, PlannerConfig
+from mesh_nav_3D.planners.planner import Planner, PlannerInput, PlannerConfig
 
 
 class BaseVisualizer(ABC):
@@ -11,6 +11,7 @@ class BaseVisualizer(ABC):
         self.mesh = planner_config.mesh
         self.output_dir = planner_config.output_dir
         self.transform = self._get_transform(planner_config.up)
+        self.mesh.transform(self.transform)
         self.planner_config = planner_config
         os.makedirs(self.output_dir, exist_ok=True)
 
@@ -24,12 +25,10 @@ class BaseVisualizer(ABC):
         return t
 
     def setup_plotter(self):
-        mesh = self.mesh.transform(self.transform)
-        mesh["Elevation"] = mesh.points[:, 2]
+        self.mesh["Elevation"] = self.mesh.points[:, 2]
         plotter = pv.Plotter()
-        plotter.add_mesh(mesh, scalars="Elevation", cmap="terrain", color='lightblue', show_edges=True)
+        plotter.add_mesh(self.mesh, scalars="Elevation", cmap="terrain", color='lightblue', show_edges=True)
         plotter.add_axes(interactive=True)
-        self.mesh = mesh
         return plotter
 
     @abstractmethod

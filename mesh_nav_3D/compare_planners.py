@@ -37,7 +37,9 @@ def compare_planners(
             result = planner.plan(input_data)
             print(
                 f"{planner_name}: Path Length={result.path_length:.2e}, "
-                f"Efficiency={result.path_efficiency:.2e}, Time={result.execution_time:.2e}s"
+                f"Efficiency={result.path_efficiency:.2e}, "
+                f"Time={result.execution_time:.2e}s,"
+                f"Memory Usage= {result.memory_used_mb}"
             )
             if save_results:
                 result.save_to_file(f"{output_dir}/{planner_name}")

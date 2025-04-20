@@ -173,3 +173,5 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 .idea
+*/metrics_outputs
+mesh_nav_3D/outputs/*
