@@ -24,6 +24,9 @@ potpourri3d = "^1.2.1"
 pydantic = "^2.11.2"
 psutil = "^7.0.0"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.5"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
