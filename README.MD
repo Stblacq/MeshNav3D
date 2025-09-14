@@ -5,7 +5,7 @@ This package provides a 3D mesh-based navigation framework with multiple path pl
 
 ## 📦 Installation
 
-1. Install python3-venv python3-pip Python 3.12 and `pip`.
+1. Install python3-venv python3-pip Python 3.12 and `pip >= 25.2`.
 2. pip install mesh_nav_3D.
 
 
