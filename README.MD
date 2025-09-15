@@ -1,26 +1,38 @@
-
 # mesh_nav_3D
-
-This package provides a 3D mesh-based navigation framework with multiple path planning algorithms and visualization tools.
+This package provides a 3D mesh-based planning framework with multiple path planning algorithms and visualization tools.
 
 ## 📦 Installation
 
-1. Install python3-venv python3-pip Python 3.12 and `pip >= 25.2`.
-2. pip install mesh_nav_3D.
+### Prerequisites
+You need to install Python 3.12+ and the corresponding pip package manager. The installation process may vary depending on your operating system:
 
+**For Ubuntu/Debian Linux:**
+```bash
+sudo apt update
+sudo apt install python3-venv python3-pip
+```
+
+**For macOS:**
+- Install Python 3.12+ from [python.org](https://python.org) or using Homebrew:
+```bash
+brew install python@3.12
+```
+
+**For Windows:**
+- Download and install Python 3.12+ from [python.org](https://python.org)
+
+### Install the Package
+Ensure you have `pip >= 25.2`, then install the package:
 
 ```bash
 pip install mesh_nav_3D
 ```
-
-> Replace `<version>` with the actual version string in the filename.
 
 ---
 
 ## 🚀 Quick Start
 
 ### Visualizing Planners
-
 To visualize a single or multiple planners on a mesh, use the following code:
 
 ```python
@@ -29,7 +41,7 @@ from mesh_nav_3D import visualize_single_planner, visualize_multiple_planners, P
 if __name__ == "__main__":
     # To visualize a single planner
     # visualize_single_planner('dijkstra_planner', PlannerConfig(mesh_file_path="terrain_mesh"))
-
+    
     # To visualize multiple planners
     visualize_multiple_planners(
         ['AStarPlanner', 'HeatMethodPlanner'],
@@ -37,12 +49,11 @@ if __name__ == "__main__":
     )
 ```
 
-Use the inbuilt `"terrain_mesh"`  or a path to a valid mesh file.
+Use the inbuilt `"terrain_mesh"` or a path to a valid mesh file.
 
 ---
 
 ### Benchmarking Multiple Planners
-
 You can compare multiple planners across several scenarios using the following code:
 
 ```python
@@ -57,7 +68,7 @@ if __name__ == "__main__":
         (4, np.array([9.09, 10.00, -0.27]), np.array([2.73, 0.91, 0.25]), 11.11),
         (5, np.array([0.45, 9.55, -0.44]), np.array([8.18, 1.36, 0.19]), 11.27),
     ]
-
+    
     for scenario in scenarios:
         print(f">>>>>>>>>>>>>>>>>>>>> Scenario {scenario[0]}")
         start_point = scenario[1]
@@ -90,27 +101,19 @@ Results will be saved to the `metrics_outputs/` folder.
 
 - Replace mesh file paths with actual paths to your `.obj`, `.ply`, or supported mesh files.
 - Ensure all dependencies are installed. If not bundled in the wheel, manually install them:
-  
+
 ```bash
-pyvista = "^0.44.2"
-tqdm = "^4.67.1"
-pygeodesic = "^0.1.11"
-potpourri3d = "^1.2.1"
-pydantic = "^2.11.2"
-psutil = "^7.0.0"
+pip install pyvista>=0.44.2 tqdm>=4.67.1 pygeodesic>=0.1.11 potpourri3d>=1.2.1 pydantic>=2.11.2 psutil>=7.0.0
 ```
 
 - **Planner Naming**: Planner names can be provided in the following formats:
-  - **snake_case**: e.g., `"dijkstra_planner"`,
-  - **PascalCase**: e.g., `"AStarPlanner"`,
-  - **Class instances**: e.g., `AStarPlanner()` (direct class instance).
+  - **snake_case**: e.g., `"dijkstra_planner"`
+  - **PascalCase**: e.g., `"AStarPlanner"`
+  - **Class instances**: e.g., `AStarPlanner()` (direct class instance)
+  
   All these formats will work and the system will handle the conversion automatically.
 
 ---
 
 ## 🤝 License
-
 MIT.
-
-```
-
