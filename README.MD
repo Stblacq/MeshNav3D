@@ -121,7 +121,7 @@ MIT.
 ## Citation
 ```
 @article{Jerome-2025,
- author = {Jerome, Otobong and Bassey, Christian and Okeme, Christian and Maloletov, Alexander and Kulathunga, Geesara},
+ author = {Jerome, Otobong and Bassey, Christian and Okeme, Christian and Maloletov, Alexander and Kulathunga,Geesara },
  doi = {10.5334/jors.573},
  journal = {Journal of Open Research Software},
  keyword = {en},
