@@ -117,3 +117,15 @@ pip install pyvista>=0.44.2 tqdm>=4.67.1 pygeodesic>=0.1.11 potpourri3d>=1.2.1 p
 
 ## 🤝 License
 MIT.
+
+## Citation
+```
+@article{Jerome-2025,
+ author = {Jerome, Otobong and Bassey, Christian and Okeme, Christian and Maloletov, Alexander and Kulathunga, Geesara},
+ doi = {10.5334/jors.573},
+ journal = {Journal of Open Research Software},
+ keyword = {en},
+ month = {Sep},
+ title = {MeshNav3D: Software for Visualizing and Benchmarking Uneven Terrain Planning Algorithms},
+ year = {2025}
+}```
