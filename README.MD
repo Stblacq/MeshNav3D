@@ -128,6 +128,7 @@ MIT.
  month = {Sep},
  title = {MeshNav3D: Software for Visualizing and Benchmarking Uneven Terrain Planning Algorithms},
  year = {2025}
-}``` 
+} 
+```   
 
 ## Pull requests with suggestions and improvements, however small or big, are welcome!
